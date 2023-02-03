@@ -71,3 +71,19 @@ def cat_to_binary(col, values):
     """
     binary_col = col.apply(lambda x: values[x])
     return binary_col 
+
+def binary_to_tf(val):
+    """Changing binary 0-1 to F-T
+
+    Args:
+        val (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    if val == 1.0:
+        return 'T'
+    elif val == 0.0:
+        return 'F'
+    else:
+        return 'missing'
