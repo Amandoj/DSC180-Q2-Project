@@ -73,7 +73,7 @@ def cat_to_binary(col, values):
     return binary_col 
 
 def binary_to_tf(val):
-    """Changing binary 0-1 to F-T
+    """Changing binary 0-1 to true-false
 
     Args:
         val (_type_): _description_
