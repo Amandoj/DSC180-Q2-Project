@@ -1,4 +1,6 @@
 from qiime2 import Artifact
+from qiime2 import Metadata
+
 import pandas as pd
 
 def read_feature_table(path):
@@ -24,3 +26,6 @@ def read_metadata(path):
     """
     metadata = pd.read_csv(path, sep='\t', index_col=0)
     return metadata
+
+def read_qiime_metadata(path):
+    return Metadata.load(path)

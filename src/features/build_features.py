@@ -13,6 +13,13 @@ def missing_values(col):
     temp = col.apply(lambda x: np.nan if x == 'not applicable' or x == 'not provided' else x)
     return temp
 
+def represents_float(s):
+    try: 
+        np.float64(s)
+    except ValueError:
+        return False
+    else:
+        return True
 
 def unified_rep_values(col):
     """Creates unified representation of numbers as only floats. Can only be used on numeric columns.
@@ -23,40 +30,9 @@ def unified_rep_values(col):
     Returns:
         _type_: _description_
     """
-    temp = col.apply(lambda x: x if pd.isnull(x) else np.float64(x))
+    temp = col.apply(lambda x: np.float64(x) if represents_float(x) else x)
     return temp
 
-
-def replace_df_values(df, numeric_cols):
-    """_summary_
-
-    Args:
-        df (_type_): _description_
-        numeric_cols (_type_): _description_
-
-    Returns:
-        _type_: _description_
-    """
-    updated_df = df.apply(lambda x: missing_values(x), axis = 1)
-    updated_df.loc[:,numeric_cols] = updated_df.loc[:,numeric_cols].apply(lambda x: unified_rep_values(x))
-    # changing dtypes of columns
-    convert_dict =  {x: np.float64 for x in numeric_cols}
-    sub_metadata_no_nan = sub_metadata_no_nan.astype(convert_dict)
-    
-    return sub_metadata_no_nan
-
-def subset_metadata(df, features):
-    """Creates subset of metadata
-
-    Args:
-        df (_type_): _description_
-        features (_type_): _description_
-        
-    Returns:
-        _type_: _description_
-    """
-    subset_metadata = df[features]
-    return subset_metadata
 
 
 def cat_to_binary(col, values):
@@ -86,4 +62,34 @@ def binary_to_tf(val):
     elif val == 0.0:
         return 'F'
     else:
-        return 'missing'
+        return val
+    
+    
+def organize_metadata(metadata, disease_cols, additional_info_cols, diabetes_binary, ckd_binary):
+    features = disease_cols + additional_info_cols
+    
+    # Drop na, 'not applicable' and 'not provided'
+    sub_metadata = metadata[features].apply(lambda x: missing_values(x), axis = 1)
+    sub_metadata = sub_metadata.dropna()
+    # unified values
+    sub_metadata = sub_metadata.apply(lambda x: unified_rep_values(x))
+    # change categorical to binary - will try to abstract this process
+    sub_metadata['diabetes2_v2'] = sub_metadata['diabetes2_v2'].apply(lambda x: eval(diabetes_binary)[x])
+    sub_metadata['ckd_v2'] = sub_metadata['ckd_v2'].apply(lambda x: eval(ckd_binary)[x])
+    sub_metadata.to_csv("data/temp/final_metadata.tsv", sep="\t")
+    # create seperate file for tf metadata - will be used for qiime models
+    sub_metadata_df = disease_metadata_to_tf(sub_metadata, disease_cols)
+    
+    return sub_metadata, sub_metadata_df
+
+def disease_metadata_to_tf(sub_metadata, disease_cols):
+    """Convert metadata df 0-1 binary to T-F binary
+
+    Args:
+        metadata (_type_): _description_
+        disease_cols (_type_): _description_
+    """
+    metadata_df = sub_metadata.copy()
+    metadata_df.loc[:,disease_cols] = metadata_df.loc[:,disease_cols].applymap(lambda x: binary_to_tf(x))
+    metadata_df.to_csv("data/temp/final_metadata_disease_tf.tsv",sep="\t")
+    return metadata_df
