@@ -79,6 +79,7 @@ def organize_metadata(metadata, disease_cols, additional_info_cols, diabetes_bin
     sub_metadata.to_csv("data/temp/final_metadata.tsv", sep="\t")
     # create seperate file for tf metadata - will be used for qiime models
     sub_metadata_df = disease_metadata_to_tf(sub_metadata, disease_cols)
+    # TODO - may have to filter out samples based on feature table in this section
     
     return sub_metadata, sub_metadata_df
 
