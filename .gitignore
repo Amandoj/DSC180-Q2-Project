@@ -3,4 +3,5 @@
 *.txt
 *.qza
 *.tsv
+*.csv
 __pycache__
