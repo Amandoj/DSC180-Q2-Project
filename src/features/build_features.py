@@ -66,6 +66,19 @@ def binary_to_tf(val):
     
     
 def organize_metadata(metadata, disease_cols, additional_info_cols, diabetes_binary, ckd_binary):
+    """Organizes metadata by dropping missing values and converting categorical variables to binary variables.
+
+    Args:
+        metadata (_type_): _description_
+        disease_cols (_type_): _description_
+        additional_info_cols (_type_): _description_
+        diabetes_binary (_type_): _description_
+        ckd_binary (_type_): _description_
+
+    Returns:
+        List: Returns two dataframes, sub_metadata which contains orginal data and sub_metadata_tf
+        which converts disease data to T and F binary
+    """
     features = disease_cols + additional_info_cols
     
     # Drop na, 'not applicable' and 'not provided'
@@ -78,10 +91,10 @@ def organize_metadata(metadata, disease_cols, additional_info_cols, diabetes_bin
     sub_metadata['ckd_v2'] = sub_metadata['ckd_v2'].apply(lambda x: eval(ckd_binary)[x])
     sub_metadata.to_csv("data/temp/final_metadata.tsv", sep="\t")
     # create seperate file for tf metadata - will be used for qiime models
-    sub_metadata_df = disease_metadata_to_tf(sub_metadata, disease_cols)
+    sub_metadata_tf = disease_metadata_to_tf(sub_metadata, disease_cols)
     # TODO - may have to filter out samples based on feature table in this section
     
-    return sub_metadata, sub_metadata_df
+    return sub_metadata, sub_metadata_tf
 
 def disease_metadata_to_tf(sub_metadata, disease_cols):
     """Convert metadata df 0-1 binary to T-F binary
@@ -92,5 +105,5 @@ def disease_metadata_to_tf(sub_metadata, disease_cols):
     """
     metadata_df = sub_metadata.copy()
     metadata_df.loc[:,disease_cols] = metadata_df.loc[:,disease_cols].applymap(lambda x: binary_to_tf(x))
-    metadata_df.to_csv("data/temp/final_metadata_disease_tf.tsv",sep="\t")
+    metadata_df.to_csv("data/temp/final_metadata_tf.tsv",sep="\t")
     return metadata_df

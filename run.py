@@ -9,7 +9,7 @@ import shutil
 
 from src.data import make_dataset
 from src.features import build_features
-from src.models import train_model
+from src.models import make_models
 from src.visualization import visualize
 
 
@@ -24,7 +24,7 @@ import shutil
 
 from src.data import make_dataset
 from src.features import build_features
-from src.models import train_model
+from src.models import make_models
 from src.visualization import visualize
 
 
@@ -53,7 +53,27 @@ def main(targets):
             
         with open("config/data-params.json") as fh:
             file_paths = json.load(fh)
-        return
+        # Reading feature table as Qiime Artifact and biom table
+        feature_table = make_dataset.read_feature_table(file_paths["feature_table_path"])
+        biom_table = make_dataset.feature_table_biom_view(feature_table)
+        # Reading metadata
+        metadata = make_dataset.read_metadata(file_paths["metadata_path"])
+        
+        ## Obtaining file paths
+        with open("config/feature-params.json") as fh:
+            feature_params = json.load(fh)
+        # Organizing metadata and returning two metadata tables
+        organized_metadata, organized_metadata_tf = build_features.organize_metadata(metadata, **feature_params)
+        
+        qiime_metadata_tf = make_dataset.read_qiime_metadata("data/temp/final_metadata_tf.tsv")
+        
+        ## Obtaining model params
+        with open("config/model-params.json") as fh:
+            model_params = json.load(fh)
+        
+        models = make_models.sample_classifier_single_disease(feature_table, qiime_metadata_tf.get_column('ckd_v2'))
+        
+        return models
         
     if 'clean' in targets:
         try:

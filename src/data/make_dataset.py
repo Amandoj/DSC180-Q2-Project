@@ -2,6 +2,7 @@ from qiime2 import Artifact
 from qiime2 import Metadata
 
 import pandas as pd
+import biom
 
 def read_feature_table(path):
     """Reads Feature Table
@@ -29,3 +30,6 @@ def read_metadata(path):
 
 def read_qiime_metadata(path):
     return Metadata.load(path)
+
+def feature_table_biom_view(feature_table):
+    return feature_table.view(biom.Table)
