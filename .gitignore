@@ -4,3 +4,4 @@
 *.qza
 *.tsv
 __pycache__
+*.tre
