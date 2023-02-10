@@ -80,9 +80,12 @@ def organize_metadata(metadata, disease_cols, additional_info_cols, diabetes_bin
         which converts disease data to T and F binary
     """
     features = disease_cols + additional_info_cols
-    
+    # Check if additional cols exist
+    if set(additional_info_cols).issubset(metadata.columns):
     # Drop na, 'not applicable' and 'not provided'
-    sub_metadata = metadata[features].apply(lambda x: missing_values(x), axis = 1)
+        sub_metadata = metadata[features].apply(lambda x: missing_values(x), axis = 1)
+    else:
+        sub_metadata = metadata[disease_cols].apply(lambda x: missing_values(x), axis = 1)
     sub_metadata = sub_metadata.dropna()
     # unified values
     sub_metadata = sub_metadata.apply(lambda x: unified_rep_values(x))
