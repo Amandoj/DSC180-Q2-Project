@@ -28,7 +28,7 @@ def co_occurence_graph(metadata, disease_cols):
     
 def total_disease_count_graphs(metadata, disease_cols):
     total_disease_counts = metadata[disease_cols].sum(axis=1)
-    ax = total_disease_counts.value_counts().plot(kind='barh')
+    ax = total_disease_counts.value_counts().sort_values(ascending=False).plot(kind='barh')
     ax.set_title('Disease Per Sample Counts')
     ax.set_ylabel('Num of Unique Diseases')
     ax.set_xlabel('Num of Samples')
