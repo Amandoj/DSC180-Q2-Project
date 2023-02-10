@@ -10,7 +10,7 @@ import shutil
 from src.data import make_dataset
 from src.features import build_features
 from src.models import make_models
-from src.visualization import visualize
+# from src.visualization import visualize
 
 
 #!/usr/bin/env python
@@ -48,7 +48,7 @@ def main(targets):
         organized_metadata = build_features.organize_metadata(metadata, **feature_params)
         
         # need to convert metadata df to qiime Metadata object
-        qiime_metadata_tf = make_dataset.read_qiime_metadata("data/temp/final_metadata_disease_tf.tsv")
+        qiime_metadata_tf = make_dataset.read_qiime_metadata("data/temp/final_metadata_tf.tsv")
         
         
         ## Obtaining model params
@@ -56,8 +56,8 @@ def main(targets):
             model_params = json.load(fh)
             
         disease_model = make_models.sample_classifier_single_disease(feature_table, qiime_metadata_tf.get_column('ckd_v2'))
-
-        return disease_model
+        print('done')
+        
 
     
     if "all" in targets:
