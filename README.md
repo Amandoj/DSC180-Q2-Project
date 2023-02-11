@@ -31,5 +31,8 @@ and select the qiime2 kernel
 * To run the entire project on the real data, from the project root dir, run `python run.py all`
   * This fetches the original data, creates features, cleans the data, and creates machine learning models
   for given disease types
+  
+## Model Performance
+To view model performance graphs, after running `run.py`, download files from `data/out` and upload to https://view.qiime2.org/
 
 Collaborator: Amando Jimenez, Emerson Chao, Renaldy Herlim
