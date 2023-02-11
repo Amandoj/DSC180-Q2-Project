@@ -1,8 +1,4 @@
 .ipynb_checkpoints
 .DS_Store
-*.txt
-*.qza
-*.tsv
+data/
 __pycache__
-*.tre
-!test/*
