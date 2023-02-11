@@ -29,7 +29,23 @@ def read_metadata(path):
     return metadata
 
 def read_qiime_metadata(path):
+    """Read metadata file in Qiime format
+
+    Args:
+        path (String): Path of preprocessed metadata file
+
+    Returns:
+        METADATA: Metadata as qiime object
+    """
     return Metadata.load(path)
 
 def feature_table_biom_view(feature_table):
+    """Reads feature table as biom table. Used to visualize feature table.
+
+    Args:
+        feature_table (FeatureTable[Frequency): Feature table artifact
+
+    Returns:
+        biom.Table: a biom table
+    """
     return feature_table.view(biom.Table)
