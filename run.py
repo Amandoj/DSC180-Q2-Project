@@ -13,22 +13,6 @@ from src.models import make_models
 # from src.visualization import visualize
 
 
-#!/usr/bin/env python
-
-
-## NECESSARY IMPORTS
-import sys
-import json
-import os
-import shutil
-
-from src.data import make_dataset
-from src.features import build_features
-from src.models import make_models
-# from src.visualization import visualize
-
-
-
 def main(targets):
     if "test" in targets:
         if not os.path.exists("data/temp"):
@@ -55,7 +39,7 @@ def main(targets):
         with open("config/model-params.json") as fh:
             model_params = json.load(fh)
             
-        disease_model = make_models.sample_classifier_single_disease(feature_table, qiime_metadata_tf.get_column('ckd_v2'))
+        disease_model = make_models.sample_classifier_diseases(feature_table, qiime_metadata_tf, feature_params['disease_cols'])
         print('done')
         
 
@@ -91,10 +75,6 @@ def main(targets):
         return models
         
     if 'clean' in targets:
-        try:
-            os.remove('final_figure.png')
-        except OSError as e: 
-            print ("Error: %s - %s." % (e.filename, e.strerror))
         try:
             shutil.rmtree("data/temp")
         except OSError as e:
