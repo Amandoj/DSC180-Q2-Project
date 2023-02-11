@@ -7,6 +7,21 @@ Abstract:
 
 (2) Place files in `data/raw` directory
 
+## Activating Qiime2
+After launching container, open terminal and type in the following command before running `run.py`:
+
+`conda activate qiime2-2022.11`
+
+To use within jupyter notebook also type in the following commands: 
+
+`pip install -–user ipykernel`
+
+`python -m ipykernel install -–user -–name=qiime2-2022.11`
+
+then refresh jupyter hub
+
+and select the qiime2 kernel
+
 ## Running the Project:
 * To revert to a clean repository, from the project root dir, run `python run.py clean`
   * This deletes all built files
