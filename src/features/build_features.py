@@ -65,7 +65,7 @@ def binary_to_tf(val):
         return val
     
     
-def organize_metadata(metadata, disease_cols, additional_info_cols, diabetes_binary, ckd_binary):
+def organize_metadata(metadata, feauture_table_samples, disease_cols, additional_info_cols, diabetes_binary, ckd_binary):
     """Organizes metadata by dropping missing values and converting categorical variables to binary variables.
 
     Args:
@@ -80,24 +80,25 @@ def organize_metadata(metadata, disease_cols, additional_info_cols, diabetes_bin
         which converts disease data to T and F binary
     """
     features = disease_cols + additional_info_cols
-    # Check if additional cols exist
-    if set(additional_info_cols).issubset(metadata.columns):
     # Drop na, 'not applicable' and 'not provided'
-        sub_metadata = metadata[features].apply(lambda x: missing_values(x), axis = 1)
-    else:
-        sub_metadata = metadata[disease_cols].apply(lambda x: missing_values(x), axis = 1)
+    sub_metadata = metadata[features].apply(lambda x: missing_values(x), axis = 1)
     sub_metadata = sub_metadata.dropna()
+    
     # unified values
     sub_metadata = sub_metadata.apply(lambda x: unified_rep_values(x))
+    
     # change categorical to binary - will try to abstract this process
     sub_metadata['diabetes2_v2'] = sub_metadata['diabetes2_v2'].apply(lambda x: eval(diabetes_binary)[x])
     sub_metadata['ckd_v2'] = sub_metadata['ckd_v2'].apply(lambda x: eval(ckd_binary)[x])
-    sub_metadata.to_csv("data/temp/final_metadata.tsv", sep="\t")
-    # create seperate file for tf metadata - will be used for qiime models
-    sub_metadata_tf = disease_metadata_to_tf(sub_metadata, disease_cols)
-    # TODO - may have to filter out samples based on feature table in this section
     
-    return sub_metadata, sub_metadata_tf
+    # Filter metadata samples based on those that exist on the feature table
+    final_metadata = sub_metadata.loc[sub_metadata.index.isin(feauture_table_samples)]
+    # save file for 0-1 metadata - will be used for visualizations
+    final_metadata.to_csv('data/temp/final_metadata.tsv',sep='\t')
+    # create seperate file for tf metadata - will be used for qiime models
+    final_metadata_tf = disease_metadata_to_tf(final_metadata, disease_cols)
+    
+    return final_metadata, final_metadata_tf
 
 def disease_metadata_to_tf(sub_metadata, disease_cols):
     """Convert metadata df 0-1 binary to T-F binary
