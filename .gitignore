@@ -2,6 +2,10 @@
 .DS_Store
 *.txt
 *.qza
+*.qzv
 *.tsv
 *.csv
+data/temp
+data/out
+data/raw
 __pycache__
