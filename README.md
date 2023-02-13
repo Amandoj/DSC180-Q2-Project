@@ -1,5 +1,5 @@
 # DSC180-Q2-Project
-Abstract: 
+Abstract: In this study, we will be exploring the gut microbiome of Latin American immigrants to determine what factors of their gut microbiome affect metabolic diseases. The goal of our project is to determine what metabolic diseases/disorders an individual has based on their gut microbiome and other supporting information on the individual. To achieve our goal, we will be exploring machine learning and data analysis techniques to summarize the key points of the data and understand the patterns and relationships in the data.
 
 
 ## Retrieving the data locally:
