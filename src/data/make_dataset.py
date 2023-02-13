@@ -3,6 +3,7 @@ from qiime2 import Metadata
 
 import pandas as pd
 import biom
+import skbio
 
 def read_feature_table(path):
     """Reads Feature Table
@@ -49,3 +50,13 @@ def feature_table_biom_view(feature_table):
         biom.Table: a biom table
     """
     return feature_table.view(biom.Table)
+
+def read_tree_table(path):
+    """
+    Reads the phylogeny tree table 
+    
+    """
+    tree = skbio.TreeNode.read(tree_path)
+    tree_artifact = qiime2.Artifact.import_data('Phylogeny[Rooted]', tree)
+    
+    return tree_artifact

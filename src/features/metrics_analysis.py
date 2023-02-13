@@ -62,10 +62,12 @@ def extract_distance_matrices(metrics):
     '''
     jaccard_dis_matrix = metrics.jaccard_distance_matrix
     bc_dis_matrix = metrics.bray_curtis_distance_matrix
-    u_unifrac_dis_matrix = metrics.unweighted_unifrac_distance_matrix
-    w_unifrac_dis_matrix = metrics.weighted_unifrac_distance_matrix
+#     u_unifrac_dis_matrix = metrics.unweighted_unifrac_distance_matrix
+#     w_unifrac_dis_matrix = metrics.weighted_unifrac_distance_matrix
     
-    return u_unifrac_dis_matrix, w_unifrac_dis_matrix, jaccard_dis_matrix, bc_dis_matrix
+#     return u_unifrac_dis_matrix, w_unifrac_dis_matrix, jaccard_dis_matrix, bc_dis_matrix
+    return jaccard_dis_matrix, bc_dis_matrix
+
 
 
 def extract_pcoa_results(metrics):
@@ -82,12 +84,14 @@ def extract_pcoa_results(metrics):
         PCoA matrix computed from Bray-Curtis distances between samples.
     '''
     
-    unweighted_unifrac_pcoa_results = metrics.unweighted_unifrac_pcoa_results
-    weighted_unifrac_pcoa_results = metrics.weighted_unifrac_pcoa_results
+#     unweighted_unifrac_pcoa_results = metrics.unweighted_unifrac_pcoa_results
+#     weighted_unifrac_pcoa_results = metrics.weighted_unifrac_pcoa_results
     jaccard_pcoa_results = metrics.jaccard_pcoa_results
     bray_curtis_pcoa_results = metrics.bray_curtis_pcoa_results
     
-    return unweighted_unifrac_pcoa_results, weighted_unifrac_pcoa_results, jaccard_pcoa_results, bray_curtis_pcoa_results
+    return jaccard_pcoa_results, bray_curtis_pcoa_results
+#     return unweighted_unifrac_pcoa_results, weighted_unifrac_pcoa_results, jaccard_pcoa_results, bray_curtis_pcoa_results
+
 
 
 def extract_umap_results(distance_matrix, n_dim, n_neighbors, min_dist=0.4, random_seed=1):
@@ -135,12 +139,14 @@ def extract_pcoa_emperor_vis(metrics):
         Emperor plot of the PCoA matrix computed from Bray-Curtis.
         '''
     
-    unweighted_unifrac_emperor = metrics.unweighted_unifrac_emperor
-    weighted_unifrac_emperor = metrics.weighted_unifrac_emperor
+#     unweighted_unifrac_emperor = metrics.unweighted_unifrac_emperor
+#     weighted_unifrac_emperor = metrics.weighted_unifrac_emperor
     jaccard_emperor = metrics.jaccard_emperor
     bray_curtis_emperor = metrics.bray_curtis_emperor
     
-    return unweighted_unifrac_emperor, weighted_unifrac_emperor, jaccard_emperor, bray_curtis_emperor
+#     return unweighted_unifrac_emperor, weighted_unifrac_emperor, jaccard_emperor, bray_curtis_emperor
+
+    return jaccard_emperor, bray_curtis_emperor
 
 def extract_umap_vis(umap_matrix, metadata):
     '''
