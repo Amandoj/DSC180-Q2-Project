@@ -1,5 +1,5 @@
 {
     "feature_table_path":"data/raw/163260_feature-table.qza",
     "metadata_path":"data/raw/11666_metadata.txt",
-    "tree_path": "data/raw/163260_insertion_tree.relabelled.tre"
+    "tree_path": "data/raw/tree_file.qza"
 }
