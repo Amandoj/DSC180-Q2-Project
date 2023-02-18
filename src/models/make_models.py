@@ -10,7 +10,7 @@ def sample_classifier_single_disease(feature_table, metadataCol):
     Returns:
         SampleEstimator[Classifier]: Trained sample estimator
     """
-    results = classify_samples(feature_table, metadataCol, missing_samples='ignore', estimator='GradientBoostingClassifier', test_size = 0.3, cv = 10,parameter_tuning = True)
+    results = classify_samples(feature_table, metadataCol, missing_samples='ignore', estimator='GradientBoostingClassifier', test_size = 0.3, cv = 10)
     # results
     sample_estimator = results.sample_estimator
     feature_importance = results.feature_importance
