@@ -57,8 +57,8 @@ def read_tree_table(path):
     Reads the phylogeny tree table 
     
     """
-    tree = skbio.TreeNode.read(tree_path)
-    tree_artifact = qiime2.Artifact.import_data('Phylogeny[Rooted]', tree)
+    tree = skbio.TreeNode.read(path)
+    tree_artifact = Artifact.import_data('Phylogeny[Rooted]', tree)
     
     return tree_artifact
 

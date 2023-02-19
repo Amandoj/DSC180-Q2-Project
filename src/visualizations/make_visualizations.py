@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-
 def create_bar_col_binary(metadata_df, disease_col):
     """Create bar graph of outcomes for given disease type
 
@@ -23,9 +22,11 @@ def disease_counts_graph(metadata_df, disease_cols):
         metadata_df (DataFrame): Metadata containing data about disease targets 
         disease_cols (List): List of disease columns
     """
-    ax = metadata_df[disease_cols].sum().sort_values(ascending=False).plot(kind='bar')
-    ax.set_ylabel('count')
+    ax = metadata_df[disease_cols].sum().sort_values(ascending=False).plot(kind='bar', color = sns.color_palette())
+    ax.set_ylabel('Count')
     ax.set_title('Disease counts')
+    ax.set_xlabel('Disease Type')
+    plt.savefig('data/out/disease_counts.png', bbox_inches='tight')
 
 def co_occurence_graph(metadata_df, disease_cols):
     """Create Co-occurence graph between disease types
@@ -37,6 +38,7 @@ def co_occurence_graph(metadata_df, disease_cols):
     disease_data = metadata_df[disease_cols]
     co_matrix = disease_data.T.dot(disease_data)
     sns.heatmap(co_matrix)
+    plt.savefig('data/out/co_occurence.png', bbox_inches='tight')
     
 def total_disease_count_graphs(metadata_df, disease_cols):
     """Create bar graph of total disease counts within samples
@@ -46,7 +48,8 @@ def total_disease_count_graphs(metadata_df, disease_cols):
         disease_cols (List): List of disease columns
     """
     total_disease_counts = metadata_df[disease_cols].sum(axis=1)
-    ax = total_disease_counts.value_counts().sort_values(ascending=False).plot(kind='barh')
-    ax.set_title('Disease Per Sample Counts')
-    ax.set_ylabel('Num of Unique Diseases')
-    ax.set_xlabel('Num of Samples')
+    ax = total_disease_counts.value_counts().sort_values(ascending=False).plot(kind='barh',color = sns.color_palette("ch:s=.25,rot=-.25",n_colors=8))
+    ax.set_title('Samples having multiple diseases')
+    ax.set_ylabel('Number of diseases')
+    ax.set_xlabel('Number of samples')
+    plt.savefig('data/out/total_disease_counts.png', bbox_inches='tight')
