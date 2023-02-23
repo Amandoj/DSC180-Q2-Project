@@ -40,7 +40,7 @@ def co_occurence_graph(metadata_df, disease_cols):
     sns.heatmap(co_matrix)
     plt.savefig('data/out/co_occurence.png', bbox_inches='tight')
     
-def total_disease_count_graphs(metadata_df, disease_cols):
+def total_disease_count_graph(metadata_df, disease_cols):
     """Create bar graph of total disease counts within samples
 
     Args:
@@ -54,3 +54,13 @@ def total_disease_count_graphs(metadata_df, disease_cols):
     ax.set_ylabel('Number of samples')
     ax.set_xlabel('Number of diseases')
     plt.savefig('data/out/total_disease_counts.png', bbox_inches='tight')
+    
+def binary_relevance_accuracy_scores_graph(disease_accuracy_scores):
+    plt.figure(figsize=(12,4))
+    ax = sns.barplot(x=list(disease_accuracy_scores.keys()), y=list(disease_accuracy_scores.values()))
+    ax.set_xlabel('Disease Type')
+    ax.set_title('Gradient Boosting Classifier Accuracy Scores')
+    ax.set_ylabel('Accuracy Score')
+    plt.tight_layout()
+    plt.savefig('data/out/GBC_accuracy_scores.png')
+    plt.show()
