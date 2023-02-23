@@ -10,7 +10,8 @@ def sample_classifier_single_disease(feature_table, metadataCol):
     Returns:
         SampleEstimator[Classifier]: Trained sample estimator
     """
-    results = classify_samples(feature_table, metadataCol, missing_samples='ignore', estimator='GradientBoostingClassifier', test_size = 0.3, cv = 10)
+    results = classify_samples(feature_table, metadataCol, missing_samples='ignore', estimator='GradientBoostingClassifier', 
+                               test_size = 0.3, cv = 10, random_state = 100)
     # results
     sample_estimator = results.sample_estimator
     feature_importance = results.feature_importance
@@ -23,8 +24,7 @@ def sample_classifier_single_disease(feature_table, metadataCol):
     test_targets = results.test_targets
     
     accuracy_results.save('data/out/accuracy_results_'+metadataCol.name)
-    heatmap.save('data/out/heatmap_'+metadataCol.name)
-    
+    model_summary.save('data/out/model_summary_'+metadataCol.name)
     return results
 
 def binary_relevance_model(feature_table, metadata, disease_targets):

@@ -48,8 +48,9 @@ def total_disease_count_graphs(metadata_df, disease_cols):
         disease_cols (List): List of disease columns
     """
     total_disease_counts = metadata_df[disease_cols].sum(axis=1)
-    ax = total_disease_counts.value_counts().sort_values(ascending=False).plot(kind='barh',color = sns.color_palette("ch:s=.25,rot=-.25",n_colors=8))
-    ax.set_title('Samples having multiple diseases')
-    ax.set_ylabel('Number of diseases')
-    ax.set_xlabel('Number of samples')
+    ax = total_disease_counts.value_counts().sort_values(ascending=False).plot(kind='bar', color = sns.color_palette("ch:s=.25,rot=-.25",n_colors=8))
+    ax.set_title('Samples with multiple diseases')
+    ax.tick_params(axis='x', labelrotation = 0)
+    ax.set_ylabel('Number of samples')
+    ax.set_xlabel('Number of diseases')
     plt.savefig('data/out/total_disease_counts.png', bbox_inches='tight')

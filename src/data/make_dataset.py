@@ -62,14 +62,14 @@ def read_tree_table(path):
     
     return tree_artifact
 
-def filter_feature_table(feature_table, min_frequency):
+def filter_feature_table(feature_table, min_samples):
     """Filter Feature table
 
     Args:
         feature_table (FeatureTable[Frequency]): Feature table that will be filtered
-        min_frequency (int): The minimum total frequency a feature must retain 
+        min_samples (int): The minimum number of samples that a feature must be present in to remain
 
     Returns:
         FeatureTable[Frequency]: Filtered table
     """
-    return filter_features(feature_table, min_frequency = min_frequency).filtered_table
+    return filter_features(feature_table, min_samples = min_samples).filtered_table
