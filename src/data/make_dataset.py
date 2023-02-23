@@ -1,6 +1,6 @@
 from qiime2 import Artifact
 from qiime2 import Metadata
-from qiime2.plugins.feature_table.methods import filter_features
+from qiime2.plugins.feature_table.methods import filter_features, filter_samples, rarefy
 
 import pandas as pd
 import biom
@@ -62,7 +62,7 @@ def read_tree_table(path):
     
     return tree_artifact
 
-def filter_feature_table(feature_table, min_samples):
+def filter_feature_table(feature_table, min_samples, metadata):
     """Filter Feature table
 
     Args:
@@ -72,4 +72,17 @@ def filter_feature_table(feature_table, min_samples):
     Returns:
         FeatureTable[Frequency]: Filtered table
     """
-    return filter_features(feature_table, min_samples = min_samples).filtered_table
+    filtered_feature_table = filter_features(feature_table, min_samples = min_samples).filtered_table
+    return filter_samples(filtered_feature_table, metadata = metadata).filtered_table
+
+def rarefy_feature_table(feature_table, sampling_depth):
+    """_summary_
+
+    Args:
+        feature_table (_type_): _description_
+        sampling_depth (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    return rarefy(feature_table, sampling_depth = sampling_depth).rarefied_table
