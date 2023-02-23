@@ -90,7 +90,8 @@ def organize_metadata(metadata_df, feauture_table_samples, disease_cols, additio
     features = disease_cols + additional_info_cols
     # Drop na, 'not applicable' and 'not provided'
     sub_metadata = metadata_df[features].apply(lambda x: missing_values(x), axis = 1)
-    sub_metadata = sub_metadata.dropna()
+    # only drop rows with missing disease data
+    sub_metadata = sub_metadata.dropna(subset = disease_cols)
     
     # unified values
     sub_metadata = sub_metadata.apply(lambda x: unified_rep_values(x))
@@ -99,7 +100,7 @@ def organize_metadata(metadata_df, feauture_table_samples, disease_cols, additio
     sub_metadata['diabetes2_v2'] = sub_metadata['diabetes2_v2'].apply(lambda x: eval(diabetes_binary)[x])
     sub_metadata['ckd_v2'] = sub_metadata['ckd_v2'].apply(lambda x: eval(ckd_binary)[x])
     
-    # Filter metadata samples based on those that exist on the feature table
+    # Filter metadata samples based on those that exist in the feature table
     final_metadata = sub_metadata.loc[sub_metadata.index.isin(feauture_table_samples)]
     # save file for 0-1 metadata - will be used for visualizations
     final_metadata.to_csv('data/temp/final_metadata.tsv',sep='\t')
