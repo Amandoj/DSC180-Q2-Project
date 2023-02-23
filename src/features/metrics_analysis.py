@@ -68,6 +68,7 @@ def extract_distance_matrices(metrics):
     return u_unifrac_dis_matrix, w_unifrac_dis_matrix, jaccard_dis_matrix, bc_dis_matrix
 
 
+
 def extract_pcoa_results(metrics):
     '''
     Returns
@@ -88,6 +89,7 @@ def extract_pcoa_results(metrics):
     bray_curtis_pcoa_results = metrics.bray_curtis_pcoa_results
     
     return unweighted_unifrac_pcoa_results, weighted_unifrac_pcoa_results, jaccard_pcoa_results, bray_curtis_pcoa_results
+
 
 
 def extract_umap_results(distance_matrix, n_dim, n_neighbors, min_dist=0.4, random_seed=1):

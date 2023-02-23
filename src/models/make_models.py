@@ -10,7 +10,8 @@ def sample_classifier_single_disease(feature_table, metadataCol):
     Returns:
         SampleEstimator[Classifier]: Trained sample estimator
     """
-    results = classify_samples(feature_table, metadataCol, missing_samples='ignore')
+    results = classify_samples(feature_table, metadataCol, missing_samples='ignore', estimator='GradientBoostingClassifier', 
+                               test_size = 0.3, cv = 10, random_state = 100)
     # results
     sample_estimator = results.sample_estimator
     feature_importance = results.feature_importance
@@ -23,11 +24,10 @@ def sample_classifier_single_disease(feature_table, metadataCol):
     test_targets = results.test_targets
     
     accuracy_results.save('data/out/accuracy_results_'+metadataCol.name)
-    heatmap.save('data/out/heatmap_'+metadataCol.name)
-    
-    return sample_estimator
+    model_summary.save('data/out/model_summary_'+metadataCol.name)
+    return results
 
-def sample_classifier_diseases(feature_table, metadata, disease_targets):
+def binary_relevance_model(feature_table, metadata, disease_targets):
     """Create machine learning models for all disease targets
 
     Args:
@@ -39,9 +39,9 @@ def sample_classifier_diseases(feature_table, metadata, disease_targets):
         List: List of all machine learning models
     """
     disease_cols = [metadata.get_column(disease) for disease in disease_targets]
-    results = []
+    results = {}
     for metadata_disease_col in disease_cols:
         qiime_model = sample_classifier_single_disease(feature_table, metadata_disease_col)
-        results.append(qiime_model)
+        results[metadata_disease_col.name] = qiime_model
     return results
     

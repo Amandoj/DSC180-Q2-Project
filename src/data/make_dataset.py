@@ -1,8 +1,10 @@
 from qiime2 import Artifact
 from qiime2 import Metadata
+from qiime2.plugins.feature_table.methods import filter_features
 
 import pandas as pd
 import biom
+import skbio
 
 def read_feature_table(path):
     """Reads Feature Table
@@ -43,9 +45,31 @@ def feature_table_biom_view(feature_table):
     """Reads feature table as biom table. Used to visualize feature table.
 
     Args:
-        feature_table (FeatureTable[Frequency): Feature table artifact
+        feature_table (FeatureTable[Frequency]): Feature table artifact
 
     Returns:
         biom.Table: a biom table
     """
     return feature_table.view(biom.Table)
+
+def read_tree_table(path):
+    """
+    Reads the phylogeny tree table 
+    
+    """
+    tree = skbio.TreeNode.read(path)
+    tree_artifact = Artifact.import_data('Phylogeny[Rooted]', tree)
+    
+    return tree_artifact
+
+def filter_feature_table(feature_table, min_samples):
+    """Filter Feature table
+
+    Args:
+        feature_table (FeatureTable[Frequency]): Feature table that will be filtered
+        min_samples (int): The minimum number of samples that a feature must be present in to remain
+
+    Returns:
+        FeatureTable[Frequency]: Filtered table
+    """
+    return filter_features(feature_table, min_samples = min_samples).filtered_table
