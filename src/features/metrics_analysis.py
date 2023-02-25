@@ -1,5 +1,6 @@
 from qiime2.plugins.diversity.pipelines import core_metrics
 from qiime2.plugins.diversity.pipelines import core_metrics_phylogenetic
+from qiime2.plugins.diversity.visualizers import beta_group_signifance
 from qiime2.plugins.diversity.methods import umap
 from qiime2.plugins.emperor.visualizers import plot
 
@@ -165,3 +166,9 @@ def extract_umap_vis(umap_matrix, metadata):
     umap_vis = plot(umap_matrix, metadata)
     
     return umap_vis
+
+def permanova_test(distance_matrix, metadata_col):
+    permanova_result = beta_group_signifance(distance_matrix, metadata_col, method='permanova')
+    permanova_result.visualization.save('data/out/permanova_test_'+metadata_col.name)
+    return permanova_result
+    
