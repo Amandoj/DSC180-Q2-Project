@@ -1,6 +1,6 @@
 from qiime2.plugins.diversity.pipelines import core_metrics
 from qiime2.plugins.diversity.pipelines import core_metrics_phylogenetic
-from qiime2.plugins.diversity.visualizers import beta_group_signifance
+from qiime2.plugins.diversity.visualizers import beta_group_significance
 from qiime2.plugins.diversity.methods import umap
 from qiime2.plugins.emperor.visualizers import plot
 
@@ -167,8 +167,30 @@ def extract_umap_vis(umap_matrix, metadata):
     
     return umap_vis
 
-def permanova_test(distance_matrix, metadata_col):
-    permanova_result = beta_group_signifance(distance_matrix, metadata_col, method='permanova')
-    permanova_result.visualization.save('data/out/permanova_test_'+metadata_col.name)
-    return permanova_result
+def permanova_test(u_unifrac_dis_matrix, w_unifrac_dis_matrix, metadata_col):
+    """Perform permanova test on given metadata column using both unweighted and weighted unifrac distance matrix
+
+    Args:
+        u_unifrac_dis_matrix (DistanceMatrix): _description_
+        w_unifrac_dis_matrix (DistanceMatrix): _description_
+        metadata_col (_type_): _description_
+    """
+    u_unifrac_permanova_result = beta_group_significance(u_unifrac_dis_matrix, metadata_col, method='permanova')
+    u_unifrac_permanova_result.visualization.save('data/out/u_unifrac_permanova_test_'+metadata_col.name)
     
+    w_unifrac_permanova_result = beta_group_significance(w_unifrac_dis_matrix, metadata_col, method='permanova')
+    w_unifrac_permanova_result.visualization.save('data/out/w_unifrac_permanova_test_'+metadata_col.name)
+
+def permanova_test_all_diseases(u_unifrac_dis_matrix, w_unifrac_dis_matrix, metadata, disease_targets):
+    """Perform permanova test on all disease columns
+
+    Args:
+        u_unifrac_dis_matrix (_type_): _description_
+        w_unifrac_dis_matrix (_type_): _description_
+        metadata (_type_): _description_
+        disease_targets (_type_): _description_
+    """
+    disease_cols = [metadata.get_column(disease) for disease in disease_targets]
+    
+    for metadata_disease_col in disease_cols:
+        permanova_test(u_unifrac_dis_matrix, w_unifrac_dis_matrix, metadata_disease_col)
