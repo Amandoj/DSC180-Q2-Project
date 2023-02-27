@@ -41,10 +41,10 @@ def extract_core_metrics(feat_table, depth, metadata, phylogeny=None):
 
     '''
     if phylogeny == None:
-        metrics = core_metrics(feat_table, depth, metadata)
+        metrics = core_metrics(feat_table, sampling_depth=depth, metadata=metadata)
         return metrics
     else:
-        metrics = core_metrics_phylogenetic(feat_table, depth, metadata)
+        metrics = core_metrics_phylogenetic(feat_table, phylogeny, sampling_depth=depth, metadata=metadata)
         return metrics
     
 
