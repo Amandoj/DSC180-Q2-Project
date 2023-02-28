@@ -8,22 +8,17 @@ def sample_classifier_single_disease(feature_table, metadataCol):
         metadataCol (MetadataColumn[Categorical]): Metadata column that will be used as prediction target
 
     Returns:
-        SampleEstimator[Classifier]: Trained sample estimator
+        Results
     """
     results = classify_samples(feature_table, metadataCol, estimator='GradientBoostingClassifier', 
                                test_size = 0.3, cv = 10, random_state = 100)
     # results
-    sample_estimator = results.sample_estimator
-    feature_importance = results.feature_importance
-    predictions = results.predictions
     model_summary = results.model_summary
     accuracy_results = results.accuracy_results
-    probabilities = results.probabilities
-    heatmap = results.heatmap
-    training_targets = results.training_targets
-    test_targets = results.test_targets
     
+    # Saving Accuracy Results
     accuracy_results.save('data/out/accuracy_results_'+metadataCol.name)
+    # Saving model summary information
     model_summary.save('data/out/model_summary_'+metadataCol.name)
     return results
 
@@ -36,11 +31,14 @@ def binary_relevance_model(feature_table, metadata, disease_targets):
         disease_targets (List): List of disease targets
 
     Returns:
-        List: List of all machine learning models
+        Dict: Dictionary of model results by disease type: {'disease_col': Qiime results}
     """
+    # Create list of metadata columns
     disease_cols = [metadata.get_column(disease) for disease in disease_targets]
     results = {}
+    # Iterate through every disease
     for metadata_disease_col in disease_cols:
+        # Create model for each disease
         qiime_model = sample_classifier_single_disease(feature_table, metadata_disease_col)
         results[metadata_disease_col.name] = qiime_model
     return results
