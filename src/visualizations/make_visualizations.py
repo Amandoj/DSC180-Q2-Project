@@ -22,10 +22,13 @@ def disease_counts_graph(metadata_df, disease_cols):
         metadata_df (DataFrame): Metadata containing data about disease targets 
         disease_cols (List): List of disease columns
     """
-    ax = metadata_df[disease_cols].sum().sort_values(ascending=False).plot(kind='bar', color = sns.color_palette())
+    plt.figure(figsize=(13,4))
+    disease_counts = metadata_df[disease_cols].sum()
+    ax = sns.barplot(x=disease_counts.index,y=disease_counts.values)
     ax.set_ylabel('Count')
     ax.set_title('Disease counts')
     ax.set_xlabel('Disease Type')
+    ax.tick_params(axis='x', labelrotation = 0)
     plt.savefig('data/out/disease_counts.png', bbox_inches='tight')
 
 def co_occurence_graph(metadata_df, disease_cols):
