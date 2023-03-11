@@ -1,4 +1,4 @@
 {
     "disease_targets": ["abdominal_obesity_ncep_v2", "ckd_v2", "diabetes2_v2",
-    "hypertension2_v2", "precvd_v2", "elevated_bp_selfmeds_v2"]
+     "precvd_v2", "elevated_bp_selfmeds_v2","dyslipidemia_v2"]
 }

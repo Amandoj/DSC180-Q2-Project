@@ -1,3 +1,5 @@
+from qiime2 import Metadata
+
 import numpy as np
 import pandas as pd
 
@@ -123,3 +125,20 @@ def disease_metadata_to_tf(final_metadata, disease_cols):
     metadata_df.loc[:,disease_cols] = metadata_df.loc[:,disease_cols].applymap(lambda x: binary_to_tf(x))
     metadata_df.to_csv("data/temp/final_metadata_tf.tsv",sep="\t")
     return metadata_df
+
+def balance_precvd(organized_metadata_tf):
+    """Balance PreCVD Classes
+
+    Args:
+        organized_metadata_tf (DataFrame): Organized metadata dataframe
+
+    Returns:
+        METADATA: Balanced PreCVD qiime Metadata Object
+    """
+    precvd_undersample = organized_metadata_tf[['precvd_v2']]
+    balanced_precvd_df = pd.concat([precvd_undersample[precvd_undersample['precvd_v2'] == 'T'],
+                                    precvd_undersample[precvd_undersample['precvd_v2'] == 'F'].sample(
+                                    precvd_undersample.value_counts().min(), random_state=2)])
+    balanced_precvd_df.to_csv('data/out/balanced_precvd_samples.tsv', sep='\t')
+    balanced_precvd_qiime = Metadata(balanced_precvd_df)
+    return balanced_precvd_qiime

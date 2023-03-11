@@ -75,14 +75,3 @@ def filter_feature_table(feature_table, min_samples, metadata):
     filtered_feature_table = filter_features(feature_table, min_samples = min_samples).filtered_table
     return filter_samples(filtered_feature_table, metadata = metadata).filtered_table
 
-def rarefy_feature_table(feature_table, sampling_depth):
-    """_summary_
-
-    Args:
-        feature_table (_type_): _description_
-        sampling_depth (_type_): _description_
-
-    Returns:
-        _type_: _description_
-    """
-    return rarefy(feature_table, sampling_depth = sampling_depth).rarefied_table

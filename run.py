@@ -11,7 +11,7 @@ from src.data import make_dataset
 from src.features import build_features
 # from src.features import core_metrics
 from src.models import make_models
-# from src.visualization import visualize
+from src.visualization import make_visualizations
 
 
 def main(targets):
@@ -34,6 +34,9 @@ def main(targets):
         # Organizing metadata and returning two metadata tables
         # organized_metadata: 0/1 binary; organized_metadata_tf:T/F binary 
         organized_metadata, organized_metadata_tf  = build_features.organize_metadata(metadata,biom_table.ids(), **feature_params)
+        
+        # Create Disease Count Graph
+        make_visualizations.disease_counts_graph(organized_metadata,feature_params['disease_cols'])
         
         # need to convert metadata dataframe to qiime Metadata object
         qiime_metadata_tf = make_dataset.read_qiime_metadata("data/temp/final_metadata_tf.tsv")
@@ -72,15 +75,23 @@ def main(targets):
         # organized_metadata: 0/1 binary; organized_metadata_tf:T/F binary 
         organized_metadata, organized_metadata_tf = build_features.organize_metadata(metadata,biom_table.ids(),**feature_params)
         
+        # TODO Balance Precvd
+        
         # Converting metadata dataframe to Qiime metadata object
         qiime_metadata_tf = make_dataset.read_qiime_metadata("data/temp/final_metadata_tf.tsv")
+        
+        #TODO Feature Analysis 
+        
+        # TODO Permanova Test
         
         ## Obtaining model params
         with open("config/model-params.json") as fh:
             model_params = json.load(fh)
         # Creating machine learning models
-        models = make_models.sample_classifier_diseases(feature_table, qiime_metadata_tf, feature_params['disease_cols'])
-        print('done')
+        models = make_models.sample_classifier_diseases(feature_table, qiime_metadata_tf, model_params['disease_targets'])
+        
+        #TODO Model Performance 
+        
         return models
         
     if 'clean' in targets:
