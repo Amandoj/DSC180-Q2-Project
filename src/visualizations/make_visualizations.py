@@ -33,17 +33,6 @@ def disease_counts_graph(metadata_df, disease_cols):
     ax.tick_params(axis='x', labelrotation = 0)
     plt.savefig('data/out/disease_counts.png', bbox_inches='tight',dpi=300)
 
-def co_occurence_graph(metadata_df, disease_cols):
-    """Create Co-occurence graph between disease types
-
-    Args:
-        metadata_df (DataFrame): Metadata containing data about disease targets 
-        disease_cols (List): List of disease columns
-    """
-    disease_data = metadata_df[disease_cols]
-    co_matrix = disease_data.T.dot(disease_data)
-    sns.heatmap(co_matrix)
-    plt.savefig('data/out/co_occurence.png', bbox_inches='tight')
     
 def total_disease_count_graph(metadata_df, disease_cols):
     """Create bar graph of total disease counts within samples

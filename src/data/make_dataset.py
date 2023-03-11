@@ -75,14 +75,19 @@ def filter_feature_table(feature_table, min_samples, metadata):
     filtered_feature_table = filter_features(feature_table, min_samples = min_samples).filtered_table
     return filter_samples(filtered_feature_table, metadata = metadata).filtered_table
 
-def rarefy_feature_table(feature_table, sampling_depth):
+
+def balance_precvd(organized_metadata_tf):
     """_summary_
 
     Args:
-        feature_table (_type_): _description_
-        sampling_depth (_type_): _description_
+        organized_metadata_tf (_type_): _description_
 
     Returns:
         _type_: _description_
     """
-    return rarefy(feature_table, sampling_depth = sampling_depth).rarefied_table
+    precvd_undersample = organized_metadata_tf[['precvd_v2']]
+    balanced_precvd_df = pd.concat([precvd_undersample[precvd_undersample['precvd_v2'] == 'T'],
+                                    precvd_undersample[precvd_undersample['precvd_v2'] == 'F'].sample(
+                                    precvd_undersample.value_counts().min(), random_state=2)])
+    balanced_precvd_qiime = Metadata(balanced_precvd_df)
+    return balanced_precvd_qiime
