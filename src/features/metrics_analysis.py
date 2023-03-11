@@ -171,13 +171,15 @@ def permanova_test(u_unifrac_dis_matrix, w_unifrac_dis_matrix, metadata_col):
     """Perform permanova test on given metadata column using both unweighted and weighted unifrac distance matrix
 
     Args:
-        u_unifrac_dis_matrix (DistanceMatrix): _description_
-        w_unifrac_dis_matrix (DistanceMatrix): _description_
-        metadata_col (_type_): _description_
+        u_unifrac_dis_matrix (DistanceMatrix): Unweighted Unifrac Distance Matrix
+        w_unifrac_dis_matrix (DistanceMatrix): Weighted Unifrac Distance Matrix
+        metadata_col (MetadataColumn[Categorical]): Metadata Column that will undergo permanova test
     """
+    # Permanova test with unweighted Unifrac Distance Matrix
     u_unifrac_permanova_result = beta_group_significance(u_unifrac_dis_matrix, metadata_col, method='permanova')
     u_unifrac_permanova_result.visualization.save('data/out/u_unifrac_permanova_test_'+metadata_col.name)
-    
+   
+    # Permanova test with weighted Unifrac Distance Matrix
     w_unifrac_permanova_result = beta_group_significance(w_unifrac_dis_matrix, metadata_col, method='permanova')
     w_unifrac_permanova_result.visualization.save('data/out/w_unifrac_permanova_test_'+metadata_col.name)
 
@@ -185,12 +187,11 @@ def permanova_test_all_diseases(u_unifrac_dis_matrix, w_unifrac_dis_matrix, meta
     """Perform permanova test on all disease columns
 
     Args:
-        u_unifrac_dis_matrix (_type_): _description_
-        w_unifrac_dis_matrix (_type_): _description_
-        metadata (_type_): _description_
-        disease_targets (_type_): _description_
-    """
-    disease_cols = [metadata.get_column(disease) for disease in disease_targets]
-    
-    for metadata_disease_col in disease_cols:
+        u_unifrac_dis_matrix (DistanceMatrix): Unweighted Unifrac Distance Matrix
+        w_unifrac_dis_matrix (DistanceMatrix): Weighted Unifrac Distance Matrix
+        metadata (METADATA): Disease metadata
+        disease_targets (List): Disease column names that will undergo permanova test
+    """    
+    for disease in disease_targets:
+        metadata_disease_col = metadata.get_column(disease)
         permanova_test(u_unifrac_dis_matrix, w_unifrac_dis_matrix, metadata_disease_col)
