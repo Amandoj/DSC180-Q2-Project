@@ -193,5 +193,7 @@ def permanova_test_all_diseases(u_unifrac_dis_matrix, w_unifrac_dis_matrix, meta
         disease_targets (List): Disease column names that will undergo permanova test
     """    
     for disease in disease_targets:
+        if disease == 'precvd_v2':
+            continue
         metadata_disease_col = metadata.get_column(disease)
         permanova_test(u_unifrac_dis_matrix, w_unifrac_dis_matrix, metadata_disease_col)

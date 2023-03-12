@@ -57,9 +57,7 @@ def read_tree_table(path):
     Reads the phylogeny tree table 
     
     """
-    tree = skbio.TreeNode.read(path)
-    tree_artifact = Artifact.import_data('Phylogeny[Rooted]', tree)
-    
+    tree_artifact = Artifact.load(path)
     return tree_artifact
 
 def filter_feature_table(feature_table, min_samples, metadata):

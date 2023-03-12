@@ -8,9 +8,8 @@ import os
 import shutil
 
 from src.data import make_dataset
-from src.features import build_features
-# from src.features import core_metrics
-from src.models import make_models
+from src.features import build_features,metrics_analysis
+from src.models import make_models, evaluate_models
 from src.visualization import make_visualizations
 
 
@@ -67,6 +66,9 @@ def main(targets):
         # Reading metadata
         metadata = make_dataset.read_metadata(file_paths["metadata_path"])
         
+        # Reading Phylogenetic Tree
+        tree_artifact = make_dataset.read_tree_table(file_paths['tree_path']) 
+
         ## Obtaining feature parameters
         with open("config/feature-params.json") as fh:
             feature_params = json.load(fh)
@@ -75,24 +77,38 @@ def main(targets):
         # organized_metadata: 0/1 binary; organized_metadata_tf:T/F binary 
         organized_metadata, organized_metadata_tf = build_features.organize_metadata(metadata,biom_table.ids(),**feature_params)
         
-        # TODO Balance Precvd
+        # Balance Precvd classes
+        qiime_metadata_precvd = build_features.balance_precvd(organized_metadata_tf)
         
         # Converting metadata dataframe to Qiime metadata object
         qiime_metadata_tf = make_dataset.read_qiime_metadata("data/temp/final_metadata_tf.tsv")
         
-        #TODO Feature Analysis 
+        # Filtering Feature Tables 
+        filtered_table = make_dataset.filter_feature_table(feature_table, 4, qiime_metadata_tf)
+        filtered_table_precvd = make_dataset.filter_feature_table(feature_table, 4, qiime_metadata_precvd)
+
         
-        # TODO Permanova Test
+        #TODO Feature Analysis
+        core_metrics_full = metrics_analysis.extract_core_metrics(filtered_table, 7930, qiime_metadata_tf, tree_artifact)
+        core_metrics_precvd = metrics_analysis.extract_core_metrics(filtered_table_precvd, 10, qiime_metadata_precvd, tree_artifact)
+        # Permanova Test
+        u_unifrac_distance_matrix, w_unifrac_distance_matrix, _, _ = metrics_analysis.extract_distance_matrices(core_metrics_full)
+        metrics_analysis.permanova_test_all_diseases(u_unifrac_distance_matrix, w_unifrac_distance_matrix, qiime_metadata_tf, feature_params['disease_cols'])
         
+        u_unifrac_distance_matrix_precvd, w_unifrac_distance_matrix_precvd, _, _ = metrics_analysis.extract_distance_matrices(core_metrics_precvd)
+        metrics_analysis.permanova_test(u_unifrac_distance_matrix_precvd, w_unifrac_distance_matrix_precvd,qiime_metadata_precvd.get_column('precvd_v2'))
+
         ## Obtaining model params
         with open("config/model-params.json") as fh:
             model_params = json.load(fh)
         # Creating machine learning models
-        models = make_models.sample_classifier_diseases(feature_table, qiime_metadata_tf, model_params['disease_targets'])
+        binary_relevance_model = make_models.sample_classifier_diseases(feature_table, qiime_metadata_tf, qiime_metadata_precvd, model_params['disease_targets'])
         
         #TODO Model Performance 
+        disease_accuracy_scores = evaluate_models.binary_relevance_accuracy_scores(binary_relevance_model, model_params['disease_targets'])
+        make_visualizations.binary_relevance_accuracy_scores_graph(disease_accuracy_scores)
         
-        return models
+        return binary_relevance_model
         
     if 'clean' in targets:
         try:
