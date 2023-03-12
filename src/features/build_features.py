@@ -1,3 +1,5 @@
+from qiime2 import Metadata
+
 import numpy as np
 import pandas as pd
 
@@ -90,7 +92,8 @@ def organize_metadata(metadata_df, feauture_table_samples, disease_cols, additio
     features = disease_cols + additional_info_cols
     # Drop na, 'not applicable' and 'not provided'
     sub_metadata = metadata_df[features].apply(lambda x: missing_values(x), axis = 1)
-    sub_metadata = sub_metadata.dropna()
+    # only drop rows with missing disease data
+    sub_metadata = sub_metadata.dropna(subset = disease_cols)
     
     # unified values
     sub_metadata = sub_metadata.apply(lambda x: unified_rep_values(x))
@@ -99,7 +102,7 @@ def organize_metadata(metadata_df, feauture_table_samples, disease_cols, additio
     sub_metadata['diabetes2_v2'] = sub_metadata['diabetes2_v2'].apply(lambda x: eval(diabetes_binary)[x])
     sub_metadata['ckd_v2'] = sub_metadata['ckd_v2'].apply(lambda x: eval(ckd_binary)[x])
     
-    # Filter metadata samples based on those that exist on the feature table
+    # Filter metadata samples based on those that exist in the feature table
     final_metadata = sub_metadata.loc[sub_metadata.index.isin(feauture_table_samples)]
     # save file for 0-1 metadata - will be used for visualizations
     final_metadata.to_csv('data/temp/final_metadata.tsv',sep='\t')
@@ -122,3 +125,20 @@ def disease_metadata_to_tf(final_metadata, disease_cols):
     metadata_df.loc[:,disease_cols] = metadata_df.loc[:,disease_cols].applymap(lambda x: binary_to_tf(x))
     metadata_df.to_csv("data/temp/final_metadata_tf.tsv",sep="\t")
     return metadata_df
+
+def balance_precvd(organized_metadata_tf):
+    """Balance PreCVD Classes
+
+    Args:
+        organized_metadata_tf (DataFrame): Organized metadata dataframe
+
+    Returns:
+        METADATA: Balanced PreCVD qiime Metadata Object
+    """
+    precvd_undersample = organized_metadata_tf[['precvd_v2']]
+    balanced_precvd_df = pd.concat([precvd_undersample[precvd_undersample['precvd_v2'] == 'T'],
+                                    precvd_undersample[precvd_undersample['precvd_v2'] == 'F'].sample(
+                                    precvd_undersample.value_counts().min(), random_state=2)])
+    balanced_precvd_df.to_csv('data/out/balanced_precvd_samples.tsv', sep='\t')
+    balanced_precvd_qiime = Metadata(balanced_precvd_df)
+    return balanced_precvd_qiime

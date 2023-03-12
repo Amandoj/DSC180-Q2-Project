@@ -1,11 +1,5 @@
 .ipynb_checkpoints
 .DS_Store
-*.txt
-*.qza
-*.qzv
-*.tsv
-*.csv
-data/temp
-data/out
-data/raw
+data/
 __pycache__
+!src/data

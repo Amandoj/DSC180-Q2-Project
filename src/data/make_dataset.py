@@ -1,5 +1,6 @@
 from qiime2 import Artifact
 from qiime2 import Metadata
+from qiime2.plugins.feature_table.methods import filter_features, filter_samples, rarefy
 
 import pandas as pd
 import biom
@@ -44,7 +45,7 @@ def feature_table_biom_view(feature_table):
     """Reads feature table as biom table. Used to visualize feature table.
 
     Args:
-        feature_table (FeatureTable[Frequency): Feature table artifact
+        feature_table (FeatureTable[Frequency]): Feature table artifact
 
     Returns:
         biom.Table: a biom table
@@ -58,3 +59,29 @@ def read_tree_table(path):
     """
     tree_artifact = Artifact.load(path)
     return tree_artifact
+
+def filter_feature_table(feature_table, min_samples, metadata):
+    """Filter Feature table
+
+    Args:
+        feature_table (FeatureTable[Frequency]): Feature table that will be filtered
+        min_samples (int): The minimum number of samples that a feature must be present in to remain
+
+    Returns:
+        FeatureTable[Frequency]: Filtered table
+    """
+    filtered_feature_table = filter_features(feature_table, min_samples = min_samples).filtered_table
+    return filter_samples(filtered_feature_table, metadata = metadata).filtered_table
+
+def rarefy_feature_table(feature_table, sampling_depth):
+    """Subsample frequencies from all samples so that the sum of frequencies in 
+    each sample is equal to sampling-depth.
+
+    Args:
+        feature_table (FeatureTable[Frequency]): _description_
+        sampling_depth (Int): The total frequency that each sample should be rarefied to.
+
+    Returns:
+        FeatureTable[Frequency]: Rarefied table
+    """
+    return rarefy(feature_table, sampling_depth=sampling_depth).rarefied_table

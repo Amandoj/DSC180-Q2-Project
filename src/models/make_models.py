@@ -8,26 +8,39 @@ def sample_classifier_single_disease(feature_table, metadataCol):
         metadataCol (MetadataColumn[Categorical]): Metadata column that will be used as prediction target
 
     Returns:
-        SampleEstimator[Classifier]: Trained sample estimator
+        sample_estimator : SampleEstimator[Classifier]
+            Trained sample estimator.
+        feature_importance : FeatureData[Importance]
+            Importance of each input feature to model accuracy.
+        predictions : SampleData[ClassifierPredictions]
+            Predicted target values for each input sample.
+        model_summary : Visualization
+            Summarized parameter and (if enabled) feature selection information for
+            the trained estimator.
+        accuracy_results : Visualization
+            Accuracy results visualization.
+        probabilities : SampleData[Probabilities]
+            Predicted class probabilities for each input sample.
+        heatmap : Visualization
+            A heatmap of the top 50 most important features from the table.
+        training_targets : SampleData[TrueTargets]
+            Series containing true target values of train samples
+        test_targets : SampleData[TrueTargets]
+            Series containing true target values of test samples
     """
-    results = classify_samples(feature_table, metadataCol, missing_samples='ignore')
+    results = classify_samples(feature_table, metadataCol, estimator='GradientBoostingClassifier', 
+                               test_size = 0.3, cv = 10, random_state = 100, missing_samples='ignore')
     # results
-    sample_estimator = results.sample_estimator
-    feature_importance = results.feature_importance
-    predictions = results.predictions
     model_summary = results.model_summary
     accuracy_results = results.accuracy_results
-    probabilities = results.probabilities
-    heatmap = results.heatmap
-    training_targets = results.training_targets
-    test_targets = results.test_targets
     
+    # Saving Accuracy Results
     accuracy_results.save('data/out/accuracy_results_'+metadataCol.name)
-    heatmap.save('data/out/heatmap_'+metadataCol.name)
-    
-    return sample_estimator
+    # Saving model summary information
+    model_summary.save('data/out/model_summary_'+metadataCol.name)
+    return results
 
-def sample_classifier_diseases(feature_table, metadata, disease_targets):
+def binary_relevance_model(feature_table, metadata, precvd_metadata, disease_targets):
     """Create machine learning models for all disease targets
 
     Args:
@@ -36,12 +49,16 @@ def sample_classifier_diseases(feature_table, metadata, disease_targets):
         disease_targets (List): List of disease targets
 
     Returns:
-        List: List of all machine learning models
+        Dict: Dictionary of model results by disease type: {'disease_col': Qiime results}
     """
-    disease_cols = [metadata.get_column(disease) for disease in disease_targets]
-    results = []
-    for metadata_disease_col in disease_cols:
-        qiime_model = sample_classifier_single_disease(feature_table, metadata_disease_col)
-        results.append(qiime_model)
+    results = {}
+    # Iterate through every disease
+    for disease_name in disease_targets:
+        if disease_name == 'precvd_v2':
+            disease_col = precvd_metadata.get_column('precvd_v2')
+        else:
+            disease_col = metadata.get_column(disease_name) 
+        qiime_model = sample_classifier_single_disease(feature_table, disease_col)
+        results[disease_name] = qiime_model
     return results
     
