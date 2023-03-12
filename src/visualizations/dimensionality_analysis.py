@@ -3,6 +3,10 @@ from qiime2.plugins.diversity.pipelines import core_metrics_phylogenetic
 from qiime2.plugins.diversity.methods import umap
 from qiime2.plugins.emperor.visualizers import plot
 
+import umap
+import matplotlib.pyplot as plt
+import numpy as np
+
 
 def extract_core_metrics_phylogenetic(feat_table, phylogeny, depth, metadata):
     '''
@@ -234,6 +238,28 @@ def extract_pcoa_emperor_vis_t(metrics):
     
     return unweighted_unifrac_emperor, weighted_unifrac_emperor, jaccard_emperor, bray_curtis_emperor
 
+def save_pcoa_outputs(metrics):
+    ''' Save all the PCoA Matrices and PCoA Emperor Plots that are in .qzv format to view on the web'''
+    
+    #PCoA coordinates embedding 
+    unweighted_unifrac_pcoa_results, weighted_unifrac_pcoa_results, jaccard_pcoa_results, bray_curtis_pcoa_results = extract_pcoa_results_t(metrics)
+
+    #3D PCoA Plots using Qiime2 Emperor plotting library
+    unweighted_unifrac_emperor, weighted_unifrac_emperor, jaccard_emperor, bray_curtis_emperor = extract_pcoa_emperor_vis_t(metrics)
+        
+    jaccard_pcoa_results.save('data/out/jac_pcoa_matrix')
+    bray_curtis_pcoa_results.save('data/out/bc_pcoa_matrix')
+    unweighted_unifrac_pcoa_results.save('data/out/u_unifrac_pcoa_matrix')
+    weighted_unifrac_pcoa_results.save('data/out/w_unifrac_pcoa_matrix')
+    
+    jaccard_emperor.save('data/out/jac_pcoa_emp')
+    bray_curtis_emperor.save('data/out/bc_pcoa_emp')
+    unweighted_unifrac_emperor.save('data/out/u_unifrac_pcoa_emp')
+    weighted_unifrac_emperor.save('data/out/w_unifrac_pcoa_emp')
+    
+    return
+
+
 def extract_umap_results(distance_matrix, n_dim, n_neighbors, min_dist=0.4, random_seed=1):
     '''
     Parameters
@@ -284,3 +310,33 @@ def extract_umap_vis(umap_matrix, metadata):
     umap_vis = plot(umap_matrix, metadata)
     
     return umap_vis
+
+def umap_plot_supervised(feature_table, target, target_dict,n_neighbors, n_components, metric):
+    '''
+    Perform supervised UMAP on the Single Disease samples, returns the embedding and save the matplotlib plot in .png format
+    '''
+    embedding = umap.UMAP(n_neighbors=n_neighbors, n_components= n_components,metric=metric, random_state=10).fit_transform(feature_table, y=target)
+    fig, ax = plt.subplots(1, figsize=(7, 4))
+    plt.scatter(*embedding.T, s=10, c=target, cmap='rainbow', alpha=1.0)
+    plt.setp(ax, xticks=[], yticks=[])
+    cbar = plt.colorbar(boundaries=np.arange(6)-0.5)
+    cbar.set_ticks(np.arange(5))
+    cbar.set_ticklabels(target_dict.keys())
+    
+    plt.title(
+    "Sample Size: 249",
+    fontsize=7,
+    pad=6.5,
+    loc="left",
+    )
+    plt.suptitle(
+    'UMAP single-disease types (n_neighbors:{0}, {1} metric)'.format(n_neighbors, metric),
+    fontsize=11,
+    fontweight="bold",
+    x=0.122,
+    y=0.97,
+    ha="left",
+    )
+    plt.savefig('data/out/umap_supervised.png', dpi=300)
+    return embedding
+
