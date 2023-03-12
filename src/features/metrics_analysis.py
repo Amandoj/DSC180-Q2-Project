@@ -1,7 +1,7 @@
-from qiime2.plugins.diversity.pipelines import core_metrics
-from qiime2.plugins.diversity.pipelines import core_metrics_phylogenetic
+from qiime2.plugins.diversity.pipelines import core_metrics, core_metrics_phylogenetic
 from qiime2.plugins.diversity.visualizers import beta_group_significance
 from qiime2.plugins.diversity.methods import umap
+from qiime2.plugins.diversity.pipelines import beta_phylogenetic
 from qiime2.plugins.emperor.visualizers import plot
 
 
@@ -197,3 +197,9 @@ def permanova_test_all_diseases(u_unifrac_dis_matrix, w_unifrac_dis_matrix, meta
             continue
         metadata_disease_col = metadata.get_column(disease)
         permanova_test(u_unifrac_dis_matrix, w_unifrac_dis_matrix, metadata_disease_col)
+
+def calculate_distance_matrices(feature_table, phylogeny):
+    distance_matrices = ['unweighted_unifrac','weighted_unifrac']
+    u_unifrac_dis_matrix = beta_phylogenetic(feature_table, phylogeny, 'unweighted_unifrac').distance_matrix
+    w_unifrac_dis_matrix = beta_phylogenetic(feature_table, phylogeny, 'weighted_unifrac').distance_matrix
+    return u_unifrac_dis_matrix, w_unifrac_dis_matrix

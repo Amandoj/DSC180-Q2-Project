@@ -73,3 +73,15 @@ def filter_feature_table(feature_table, min_samples, metadata):
     filtered_feature_table = filter_features(feature_table, min_samples = min_samples).filtered_table
     return filter_samples(filtered_feature_table, metadata = metadata).filtered_table
 
+def rarefy_feature_table(feature_table, sampling_depth):
+    """Subsample frequencies from all samples so that the sum of frequencies in 
+    each sample is equal to sampling-depth.
+
+    Args:
+        feature_table (FeatureTable[Frequency]): _description_
+        sampling_depth (Int): The total frequency that each sample should be rarefied to.
+
+    Returns:
+        FeatureTable[Frequency]: Rarefied table
+    """
+    return rarefy(feature_table, sampling_depth=sampling_depth).rarefied_table

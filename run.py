@@ -10,7 +10,7 @@ import shutil
 from src.data import make_dataset
 from src.features import build_features,metrics_analysis
 from src.models import make_models, evaluate_models
-from src.visualization import make_visualizations
+from src.visualizations import make_visualizations
 
 
 def main(targets):
@@ -46,7 +46,7 @@ def main(targets):
             model_params = json.load(fh)
         
         # Creating machine learning models
-        disease_models = make_models.sample_classifier_diseases(feature_table, qiime_metadata_tf,feature_params['disease_cols'])
+        disease_models = make_models.binary_relevance_model(feature_table, qiime_metadata_tf,feature_params['disease_cols'])
         print('done')
         return disease_models
 
@@ -87,27 +87,29 @@ def main(targets):
         filtered_table = make_dataset.filter_feature_table(feature_table, 4, qiime_metadata_tf)
         filtered_table_precvd = make_dataset.filter_feature_table(feature_table, 4, qiime_metadata_precvd)
 
-        
-        #TODO Feature Analysis
-        core_metrics_full = metrics_analysis.extract_core_metrics(filtered_table, 7930, qiime_metadata_tf, tree_artifact)
-        core_metrics_precvd = metrics_analysis.extract_core_metrics(filtered_table_precvd, 10, qiime_metadata_precvd, tree_artifact)
+        print('feature analysis')
+        #Feature Analysis
+        rarefied_table = make_dataset.rarefy_feature_table(filtered_table, 7930)
+        u_unifrac_distance_matrix, w_unifrac_distance_matrix = metrics_analysis.calculate_distance_matrices(rarefied_table, tree_artifact)
         # Permanova Test
-        u_unifrac_distance_matrix, w_unifrac_distance_matrix, _, _ = metrics_analysis.extract_distance_matrices(core_metrics_full)
         metrics_analysis.permanova_test_all_diseases(u_unifrac_distance_matrix, w_unifrac_distance_matrix, qiime_metadata_tf, feature_params['disease_cols'])
         
-        u_unifrac_distance_matrix_precvd, w_unifrac_distance_matrix_precvd, _, _ = metrics_analysis.extract_distance_matrices(core_metrics_precvd)
-        metrics_analysis.permanova_test(u_unifrac_distance_matrix_precvd, w_unifrac_distance_matrix_precvd,qiime_metadata_precvd.get_column('precvd_v2'))
+        #Feature Analysis precvd
+        u_unifrac_distance_matrix_precvd,w_unifrac_distance_matrix_precvd = metrics_analysis.calculate_distance_matrices(filtered_table_precvd, tree_artifact)
+        metrics_analysis.permanova_test(u_unifrac_distance_matrix_precvd, w_unifrac_distance_matrix_precvd, qiime_metadata_precvd.get_column('precvd_v2'))
 
         ## Obtaining model params
         with open("config/model-params.json") as fh:
             model_params = json.load(fh)
+        print('model begin')
         # Creating machine learning models
-        binary_relevance_model = make_models.sample_classifier_diseases(feature_table, qiime_metadata_tf, qiime_metadata_precvd, model_params['disease_targets'])
+        binary_relevance_model = make_models.binary_relevance_model(feature_table, qiime_metadata_tf, qiime_metadata_precvd, model_params['disease_targets'])
         
-        #TODO Model Performance 
+        #Model Performance 
         disease_accuracy_scores = evaluate_models.binary_relevance_accuracy_scores(binary_relevance_model, model_params['disease_targets'])
         make_visualizations.binary_relevance_accuracy_scores_graph(disease_accuracy_scores)
-        
+        print('end')
+
         return binary_relevance_model
         
     if 'clean' in targets:
