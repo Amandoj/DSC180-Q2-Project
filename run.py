@@ -39,14 +39,19 @@ def main(targets):
         
         # need to convert metadata dataframe to qiime Metadata object
         qiime_metadata_tf = make_dataset.read_qiime_metadata("data/temp/final_metadata_tf.tsv")
+        filtered_table = make_dataset.filter_feature_table(feature_table, 1, qiime_metadata_tf)
         
-        
+        braycurtis_matrix = metrics_analysis.calculate_distance_matrix(filtered_table,'braycurtis')
+        metrics_analysis.permanova_test(braycurtis_matrix,qiime_metadata_tf.get_column('abdominal_obesity_ncep_v2') ,'braycurtis')
         ## Obtaining model params
         with open("config/model-params.json") as fh:
             model_params = json.load(fh)
         
         # Creating machine learning models
-        disease_models = make_models.binary_relevance_model(feature_table, qiime_metadata_tf,feature_params['disease_cols'])
+        disease_models = make_models.binary_relevance_model(filtered_table, qiime_metadata_tf,feature_params['disease_cols'])
+        # Model Performance 
+        disease_accuracy_scores = evaluate_models.binary_relevance_accuracy_scores(binary_relevance_model, model_params['disease_targets'])
+        make_visualizations.binary_relevance_accuracy_scores_graph(disease_accuracy_scores)
         print('done')
         return disease_models
 
@@ -90,12 +95,12 @@ def main(targets):
         print('feature analysis')
         #Feature Analysis
         rarefied_table = make_dataset.rarefy_feature_table(filtered_table, 7930)
-        u_unifrac_distance_matrix, w_unifrac_distance_matrix = metrics_analysis.calculate_distance_matrices(rarefied_table, tree_artifact)
+        u_unifrac_distance_matrix, w_unifrac_distance_matrix = metrics_analysis.calculate_unifrac_distance_matrices(rarefied_table, tree_artifact)
         # Permanova Test
         metrics_analysis.permanova_test_all_diseases(u_unifrac_distance_matrix, w_unifrac_distance_matrix, qiime_metadata_tf, feature_params['disease_cols'])
         
         #Feature Analysis precvd
-        u_unifrac_distance_matrix_precvd,w_unifrac_distance_matrix_precvd = metrics_analysis.calculate_distance_matrices(filtered_table_precvd, tree_artifact)
+        u_unifrac_distance_matrix_precvd,w_unifrac_distance_matrix_precvd = metrics_analysis.calculate_unifrac_distance_matrices(filtered_table_precvd, tree_artifact)
         metrics_analysis.permanova_test(u_unifrac_distance_matrix_precvd, w_unifrac_distance_matrix_precvd, qiime_metadata_precvd.get_column('precvd_v2'))
 
         ## Obtaining model params

@@ -1,7 +1,7 @@
 {
     "disease_cols": ["abdominal_obesity_ncep_v2", "ckd_v2", "diabetes2_v2",
                      "precvd_v2", "elevated_bp_selfmeds_v2","dyslipidemia_v2"],
-    "additional_info_cols": ["hispanic_origin","agegroup_c6_v2"],
+    "additional_info_cols": [],
     "diabetes_binary": "{1.0:0.0,2.0:0.0,3.0:1.0}",
     "ckd_binary":  "{1.0:0.0, 2.0:1.0,3.0:1.0,4.0:1.0,5.0:1.0}"
 }
