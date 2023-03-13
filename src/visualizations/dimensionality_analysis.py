@@ -247,15 +247,15 @@ def save_pcoa_outputs(metrics):
     #3D PCoA Plots using Qiime2 Emperor plotting library
     unweighted_unifrac_emperor, weighted_unifrac_emperor, jaccard_emperor, bray_curtis_emperor = extract_pcoa_emperor_vis_t(metrics)
         
-    jaccard_pcoa_results.save('data/out/jac_pcoa_matrix')
-    bray_curtis_pcoa_results.save('data/out/bc_pcoa_matrix')
-    unweighted_unifrac_pcoa_results.save('data/out/u_unifrac_pcoa_matrix')
-    weighted_unifrac_pcoa_results.save('data/out/w_unifrac_pcoa_matrix')
+    jaccard_pcoa_results.save('outputs/jac_pcoa_matrix')
+    bray_curtis_pcoa_results.save('outputs/bc_pcoa_matrix')
+    unweighted_unifrac_pcoa_results.save('outputs/u_unifrac_pcoa_matrix')
+    weighted_unifrac_pcoa_results.save('outputs/w_unifrac_pcoa_matrix')
     
-    jaccard_emperor.save('data/out/jac_pcoa_emp')
-    bray_curtis_emperor.save('data/out/bc_pcoa_emp')
-    unweighted_unifrac_emperor.save('data/out/u_unifrac_pcoa_emp')
-    weighted_unifrac_emperor.save('data/out/w_unifrac_pcoa_emp')
+    jaccard_emperor.save('outputs/jac_pcoa_emp')
+    bray_curtis_emperor.save('outputs/bc_pcoa_emp')
+    unweighted_unifrac_emperor.save('outputs/u_unifrac_pcoa_emp')
+    weighted_unifrac_emperor.save('outputs/w_unifrac_pcoa_emp')
     
     return
 
@@ -337,6 +337,6 @@ def umap_plot_supervised(feature_table, target, target_dict,n_neighbors, n_compo
     y=0.97,
     ha="left",
     )
-    plt.savefig('data/out/umap_supervised.png', dpi=300)
+    plt.savefig('outputs/umap_supervised.png', dpi=300)
     return embedding
 
