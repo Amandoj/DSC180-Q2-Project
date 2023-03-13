@@ -4,7 +4,6 @@ from qiime2.plugins.feature_table.methods import filter_features, filter_samples
 
 import pandas as pd
 import biom
-import skbio
 
 def read_feature_table(path):
     """Reads Feature Table
