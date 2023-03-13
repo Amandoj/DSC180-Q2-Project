@@ -48,12 +48,12 @@ def main(targets):
             model_params = json.load(fh)
         
         # Creating machine learning models
-        disease_models = make_models.binary_relevance_model(filtered_table, qiime_metadata_tf,feature_params['disease_cols'])
+        binary_relevance_model = make_models.binary_relevance_model(filtered_table, qiime_metadata_tf,qiime_metadata_tf,feature_params['disease_cols'])
         # Model Performance 
         disease_accuracy_scores = evaluate_models.binary_relevance_accuracy_scores(binary_relevance_model, model_params['disease_targets'])
         make_visualizations.binary_relevance_accuracy_scores_graph(disease_accuracy_scores)
         print('done')
-        return disease_models
+        return binary_relevance_model
 
     
     if "all" in targets:
@@ -81,6 +81,9 @@ def main(targets):
         # Organizing metadata and returning two metadata tables
         # organized_metadata: 0/1 binary; organized_metadata_tf:T/F binary 
         organized_metadata, organized_metadata_tf = build_features.organize_metadata(metadata,biom_table.ids(),**feature_params)
+        
+        # Create disease count graph
+        make_visualizations.disease_counts_graph(organized_metadata, feature_params['disease_cols'])
         
         # Balance Precvd classes
         qiime_metadata_precvd = build_features.balance_precvd(organized_metadata_tf)
