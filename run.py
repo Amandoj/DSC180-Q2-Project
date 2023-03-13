@@ -99,9 +99,11 @@ def main(targets):
         # Permanova Test
         metrics_analysis.permanova_test_all_diseases(u_unifrac_distance_matrix, w_unifrac_distance_matrix, qiime_metadata_tf, feature_params['disease_cols'])
         
-        #Feature Analysis precvd
+        #Feature Analysis - precvd
         u_unifrac_distance_matrix_precvd,w_unifrac_distance_matrix_precvd = metrics_analysis.calculate_unifrac_distance_matrices(filtered_table_precvd, tree_artifact)
-        metrics_analysis.permanova_test(u_unifrac_distance_matrix_precvd, w_unifrac_distance_matrix_precvd, qiime_metadata_precvd.get_column('precvd_v2'))
+        metrics_analysis.permanova_test(u_unifrac_distance_matrix_precvd, qiime_metadata_precvd.get_column('precvd_v2'),'u_unifrac')
+        metrics_analysis.permanova_test(w_unifrac_distance_matrix_precvd, qiime_metadata_precvd.get_column('precvd_v2'),'w_unifrac')
+
 
         ## Obtaining model params
         with open("config/model-params.json") as fh:
