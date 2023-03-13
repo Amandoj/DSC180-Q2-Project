@@ -10,7 +10,7 @@ import shutil
 from src.data import make_dataset
 from src.features import build_features,metrics_analysis
 from src.models import make_models, evaluate_models
-from src.visualizations import make_visualizations
+from src.visualizations import make_visualizations, dimensionality_analysis
 
 
 def main(targets):
@@ -81,15 +81,42 @@ def main(targets):
         qiime_metadata_precvd = build_features.balance_precvd(organized_metadata_tf)
         
         # Converting metadata dataframe to Qiime metadata object
-        qiime_metadata_tf = make_dataset.read_qiime_metadata("data/temp/final_metadata_tf.tsv")
-        
+        qiime_metadata_tf = make_dataset.read_qiime_metadata("data/temp/final_metadata_tf.tsv") #Metadata with True and False booleans
+        qiime_metadata = make_dataset.read_qiime_metadata("data/temp/final_metadata.tsv") #Metadata with 1 and 0s floats
+
         # Filtering Feature Tables 
         filtered_table = make_dataset.filter_feature_table(feature_table, 4, qiime_metadata_tf)
         filtered_table_precvd = make_dataset.filter_feature_table(feature_table, 4, qiime_metadata_precvd)
+        
+        
+        #DIMENSIONALITY ANALYSIS
+        print('Dimensionality Analysis')
+        
+        #Extract the core metrics, distance matrices, PCoA and UMAP matrices as well as their plots for
+        #dimensionality analysis of the feature table
+        
+        depth = 7930 #The sampling depth used for the rarefecation of the feature table
+        feature_table_metrics_phy = dimensionality_analysis.extract_core_metrics_phylogenetic(filtered_table, tree_artifact, depth, qiime_metadata)
+        
+        #Save the outputs of the PCoA analysis .QZV files into 'outputs' folder to view on view.qiime2.org
+        dimensionality_analysis.save_pcoa_outputs(feature_table_metrics_phy)
+
+        #Filtering metadata and feature table to only get samples with 1 target disease type, to remove disease ambiguity and perform supervised UMAP
+        metadata_df = qiime_metadata.to_dataframe()
+        feature_df_target_disease, target_disease_map, target_disease_dict = dimensionality_analysis.process_table_umap(feature_table, metadata_df)
+        
+        #Perform the supervised UMAP with the following parameters
+        n_neighbors = 75
+        n_dimensions = 2
+        metric = "jaccard"
+
+        #Create the UMAP embeddings matrix and plot the UMAP results
+        umap_embedding = dimensionality_analysis.umap_plot_supervised(feature_df_target_disease, target_disease_map, target_disease_dict, n_neighbors, n_dimensions, metric)
+        
 
         print('feature analysis')
         #Feature Analysis
-        rarefied_table = make_dataset.rarefy_feature_table(filtered_table, 7930)
+        rarefied_table = make_dataset.rarefy_feature_table(filtered_table, depth)
         u_unifrac_distance_matrix, w_unifrac_distance_matrix = metrics_analysis.calculate_distance_matrices(rarefied_table, tree_artifact)
         # Permanova Test
         metrics_analysis.permanova_test_all_diseases(u_unifrac_distance_matrix, w_unifrac_distance_matrix, qiime_metadata_tf, feature_params['disease_cols'])

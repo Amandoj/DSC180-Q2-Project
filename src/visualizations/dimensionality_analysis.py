@@ -2,10 +2,13 @@ from qiime2.plugins.diversity.pipelines import core_metrics
 from qiime2.plugins.diversity.pipelines import core_metrics_phylogenetic
 from qiime2.plugins.diversity.methods import umap
 from qiime2.plugins.emperor.visualizers import plot
+from qiime2.plugins.feature_table.methods import filter_samples
+from qiime2 import Metadata
 
 import umap
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 
 def extract_core_metrics_phylogenetic(feat_table, phylogeny, depth, metadata):
@@ -260,56 +263,58 @@ def save_pcoa_outputs(metrics):
     return
 
 
-def extract_umap_results(distance_matrix, n_dim, n_neighbors, min_dist=0.4, random_seed=1):
+def process_table_umap(table, metadata_df):
     '''
+    Process the feature table by mapping disease labels into parameters for the UMAP algorithm
+
     Parameters
     ----------
-    distance_matrix : DistanceMatrix
-        The distance matrix on which UMAP should be computed.
-    number_of_dimensions : Int % Range(2, None), optional
-        Dimensions to reduce the distance matrix to.
-    n_neighbors : Int % Range(1, None), optional
-        Provide the balance between local and global structure. Low values
-        prioritize the preservation of local structures. Large values sacrifice
-        local details for a broader global embedding.
-    min_dist : Float % Range(0, None), optional
-        Controls the cluster size. Low values cause clumpier clusters. Higher
-        values preserve a broad topological structure. To get less overlapping
-        data points the default value is set to 0.4. For more details visit:
-        https://umap-learn.readthedocs.io/en/latest/parameters.html
-    random_state : Int, optional
-        Seed used by random number generator.
+    table
+
+    metadata_df
     
     Returns
     -------
-    umap : PCoAResults
-    The resulting UMAP matrix.
+    feature_df_target_disease: Feature table in Pandas dataframe format, that has been filtered with the metadata of samples with only 1 target disease
+    target_disease_mapped: Metadata information that has been processed to only include the target disease types and sample ID, mapped to the numeric encoding of the disease type (e.g, 1,2,3,4 or 5)
+    target_disease_dict: The dictionary of the mapping of target disease
     '''
-    umap_results = umap(distance_matrix, n_dim, n_neighbors, min_dist, random_seed)
-
-    return umap_results
-
-def extract_umap_vis(umap_matrix, metadata):
-    '''
-    Returns the emperor visualization objects (in .qzv format)
+    filtered_metadata_df = metadata_df.drop(['hispanic_origin', 'agegroup_c6_v2'], axis=1)
+    filtered_metadata_df = filtered_metadata_df[(filtered_metadata_df.sum(axis=1) == 1)] #We have around 300 samples left
     
-    Parameters
-    ----------
-    biplot : PCoAResults % Properties('biplot')
-        The principal coordinates matrix to be plotted.
-    sample_metadata : Metadata
-        The sample metadata
-    feature_metadata : Metadata, optional
-        The feature metadata (useful to manipulate the arrows in the plot).
-        
-        
-    Returns
-    -------
-    visualization : Visualization
-    '''
-    umap_vis = plot(umap_matrix, metadata)
+    #Convert binary columns into a single categorical target column for disease type
+    filtered_metadata_df["target_disease"] = filtered_metadata_df.idxmax(axis=1)
+
+    #Get the target disease and sample name,then create the metadata and filterd feature table
+    target_disease = filtered_metadata_df['target_disease']
+    target_disease.to_csv('data/temp/target_disease.tsv', sep="\t")
+
+    metadata_target_disease = Metadata.load("data/temp/target_disease.tsv") 
+    feature_table_target_disease = filter_samples(table, metadata = metadata_target_disease).filtered_table
+
+    #View as a DF to perform cleaning
+    feature_df_target_disease = feature_table_target_disease.view(pd.DataFrame)
+    feature_df_target_disease = feature_df_target_disease[feature_df_target_disease.columns[((feature_df_target_disease > 0).sum() > 3)]] #Dropping features that appear in less than 3 samples
     
-    return umap_vis
+    #Rename disease labels for better readability
+    target_disease_renamed = {'abdominal_obesity_ncep_v2': 'Obesity',
+    'ckd_v2': 'CKD',
+    'dyslipidemia_v2': 'Dyslipidemia',
+    'elevated_bp_selfmeds_v2': 'Elevated BP',
+    'diabetes2_v2': 'Diabetes'}
+    target_disease = target_disease.map(target_disease_renamed)
+
+    #Convert target disease into categorical numbers
+    target_disease_dict = {}
+
+    for i in range(len(target_disease.unique())):
+        target_disease_dict[target_disease.unique()[i]] = i
+
+    #Map the target diseases
+    target_disease_mapped = target_disease.map(target_disease_dict)
+
+    return feature_df_target_disease, target_disease_mapped, target_disease_dict 
+
 
 def umap_plot_supervised(feature_table, target, target_dict,n_neighbors, n_components, metric):
     '''
@@ -324,7 +329,7 @@ def umap_plot_supervised(feature_table, target, target_dict,n_neighbors, n_compo
     cbar.set_ticklabels(target_dict.keys())
     
     plt.title(
-    "Sample Size: 249",
+    "Sample Size: 324",
     fontsize=7,
     pad=6.5,
     loc="left",
