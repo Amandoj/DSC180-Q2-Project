@@ -32,11 +32,25 @@ def calculate_distance_matrix(feature_table, metric):
 def calculate_pcoa(distance_matrix, n_dimensions):
     return pcoa(distance_matrix, n_dimensions).pcoa
         
-# def calculate_distance_matrices(feature_table, metrics, phylogeny=None):
-#     output = {}
-#     for x in metrics:
-#         if 
-#         output[x] = calculate_distance_matrix(feature_table, x)
+def calculate_distance_matrices(feature_table, metrics, phylogeny=None):
+    output = {}
+    for x in metrics:
+        if (x == 'unweighted_unifrac') or (x == 'weighted_unifrac'):
+            if phylogeny is None:
+                print("Can't Calculate " + x +" distance matrix without phylogeny tree")
+                continue
+            else:
+                distance_matrix = beta_phylogenetic(feature_table, phylogeny, x).distance_matrix
+        else:
+            distance_matrix = beta(feature_table, x).distance_matrix
+        output[x] = distance_matrix
+    return output
+
+def calculate_multiple_pcoa(distance_matrix_dict, n_dimensions):
+    pcoa_results = {}
+    for i in distance_matrix_dict.keys():
+        pcoa_results[i] = calculate_pcoa(distance_matrix_dict[i], n_dimensions)
+    return pcoa_results
 
 def permanova_test(distance_matrix, metadata_col, metric):
     """Perform permanova test on given column

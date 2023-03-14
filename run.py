@@ -122,24 +122,21 @@ def main(targets):
         print('Permanova Test')
         # Permanova Test - all diseases w/o precvd
         rarefied_table = make_dataset.rarefy_feature_table(filtered_table, depth)
-        u_unifrac_distance_matrix, w_unifrac_distance_matrix = metrics_analysis.calculate_unifrac_distance_matrices(rarefied_table, tree_artifact)
-        print('emperor')
-        p = metrics_analysis.calculate_pcoa(u_unifrac_distance_matrix, 3)
-        dimensionality_analysis.plot_pcoa(p, qiime_metadata_tf,'u_unifrac')
         
-        p = metrics_analysis.calculate_pcoa(w_unifrac_distance_matrix, 3)
-        dimensionality_analysis.plot_pcoa(p, qiime_metadata_tf,'w_unifrac')
+        with open("config/dim-analysis-params.json") as fh:
+            dim_analysis_params = json.load(fh)
         
-        braycurtis_matrix = metrics_analysis.calculate_distance_matrix(rarefied_table,'braycurtis')
-        p = metrics_analysis.calculate_pcoa(braycurtis_matrix, 3)
-        dimensionality_analysis.plot_pcoa(p, qiime_metadata_tf,'braycurtis')
         
-        jaccard_matrix = metrics_analysis.calculate_distance_matrix(rarefied_table,'jaccard')
-        p = metrics_analysis.calculate_pcoa(braycurtis_matrix, 3)
-        dimensionality_analysis.plot_pcoa(p, qiime_metadata_tf,'jaccard')
+        distance_matrices = metrics_analysis.calculate_distance_matrices(rarefied_table,metrics = dim_analysis_params['metrics'], phylogeny = tree_artifact)
+        
+        
+        pcoa_results = metrics_analysis.calculate_multiple_pcoa(distance_matrices, 3)
+        
+        
+        dimensionality_analysis.plot_multiple_pcoa(pcoa_results, qiime_metadata_tf)
         
         print('emperor done')
-        metrics_analysis.permanova_test_all_diseases(u_unifrac_distance_matrix, w_unifrac_distance_matrix, qiime_metadata_tf, feature_params['disease_cols'])
+        metrics_analysis.permanova_test_all_diseases(distance_matrices['unweighted_unifrac'], distance_matrices['weighted_unifrac'], qiime_metadata_tf, feature_params['disease_cols'])
         
         #Permanova Test - precvd
         u_unifrac_distance_matrix_precvd,w_unifrac_distance_matrix_precvd = metrics_analysis.calculate_unifrac_distance_matrices(filtered_table_precvd, tree_artifact)

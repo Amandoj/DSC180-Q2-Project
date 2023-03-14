@@ -13,10 +13,10 @@ import pandas as pd
 def plot_pcoa(pcoa, metadata, metric):
     plot(pcoa=pcoa, metadata=metadata).visualization.save('outputs/'+metric+'_pcoa_emp')
 
-# def plot_multiple_pcoa(pcoa_results, metadata):
-#     for metric in pcoa_results.keys():
-#         pcoa = pcoa_results[metric]
-#         plot_pcoa(pcoa, metadata, metric)
+def plot_multiple_pcoa(pcoa_results, metadata):
+    for metric in pcoa_results.keys():
+        pcoa = pcoa_results[metric]
+        plot_pcoa(pcoa, metadata, metric)
         
 def process_table_umap(table, metadata_df, disease_cols):
     '''
