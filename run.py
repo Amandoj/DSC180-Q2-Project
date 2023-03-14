@@ -27,20 +27,21 @@ def main(targets):
         feature_table = make_dataset.read_feature_table(test_path_feature_table)
         biom_table = make_dataset.feature_table_biom_view(feature_table)
         
-        with open("config/feature-params.json") as fh:
-            feature_params = json.load(fh)
+        with open("config/test-feature-params.json") as fh:
+            test_feature_params = json.load(fh)
         
         # Organizing metadata and returning two metadata tables
         # organized_metadata: 0/1 binary; organized_metadata_tf:T/F binary 
-        organized_metadata, organized_metadata_tf  = build_features.organize_metadata(metadata,biom_table.ids(), **feature_params)
+        organized_metadata, organized_metadata_tf  = build_features.organize_metadata(metadata,biom_table.ids(), **test_feature_params)
         
         # Create Disease Count Graph
-        make_visualizations.disease_counts_graph(organized_metadata,feature_params['disease_cols'])
+        make_visualizations.disease_counts_graph(organized_metadata,test_feature_params['disease_cols'])
         
-        # need to convert metadata dataframe to qiime Metadata object
+        # Convert metadata dataframe to qiime Metadata object
         qiime_metadata_tf = make_dataset.read_qiime_metadata("data/temp/final_metadata_tf.tsv")
         filtered_table = make_dataset.filter_feature_table(feature_table, 1, qiime_metadata_tf)
         
+        # Permanova Test
         braycurtis_matrix = metrics_analysis.calculate_distance_matrix(filtered_table,'braycurtis')
         metrics_analysis.permanova_test(braycurtis_matrix, qiime_metadata_tf.get_column('abdominal_obesity_ncep_v2') ,'braycurtis')
         ## Obtaining model params
@@ -52,7 +53,7 @@ def main(targets):
         # Model Performance 
         disease_accuracy_scores = evaluate_models.binary_relevance_accuracy_scores(binary_relevance_model, model_params['disease_targets'])
         make_visualizations.binary_relevance_accuracy_scores_graph(disease_accuracy_scores)
-        print('done')
+        print('End')
         return binary_relevance_model
 
     
