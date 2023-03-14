@@ -1,4 +1,3 @@
-from qiime2.plugins.diversity.pipelines import core_metrics
 from qiime2.plugins.diversity.pipelines import core_metrics_phylogenetic
 from qiime2.plugins.diversity.methods import umap
 from qiime2.plugins.emperor.visualizers import plot
@@ -10,13 +9,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-def plot_pcoa(pcoa, metadata, metric):
-    plot(pcoa=pcoa, metadata=metadata).visualization.save('outputs/'+metric+'_pcoa_emp')
+def plot_pcoa(pcoa_results, metadata):
+    """Create PcoA emperor plots
 
-def plot_multiple_pcoa(pcoa_results, metadata):
+    Args:
+        pcoa_results (Dict): Dictionary containing pcoa results
+        metadata (METADATA): Metadata
+    """
     for metric in pcoa_results.keys():
         pcoa = pcoa_results[metric]
-        plot_pcoa(pcoa, metadata, metric)
+        plot(pcoa=pcoa, metadata=metadata).visualization.save('outputs/'+metric+'_pcoa_emp')
         
 def process_table_umap(table, metadata_df, disease_cols):
     '''
@@ -24,9 +26,9 @@ def process_table_umap(table, metadata_df, disease_cols):
 
     Parameters
     ----------
-    table
+    table: feature table
 
-    metadata_df
+    metadata_df: Metadata dataframe
     
     Returns
     -------

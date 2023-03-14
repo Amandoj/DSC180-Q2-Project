@@ -1,1 +1,1 @@
-{"metrics":["unweighted_unifrac","weighted_unifrac","braycurtis","jaccard"]}
+{"metrics":["unweighted_unifrac","weighted_unifrac","braycurtis","jaccard"],"pcoa_n_dimensions":3}

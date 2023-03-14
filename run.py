@@ -1,14 +1,10 @@
 #!/usr/bin/env python
 
-
 ## NECESSARY IMPORTS
 import sys
 import json
 import os
 import shutil
-
-from qiime2.plugins.emperor.visualizers import plot
-from qiime2.plugins.diversity.methods import pcoa
 
 from src.data import make_dataset
 from src.features import build_features,metrics_analysis
@@ -45,7 +41,7 @@ def main(targets):
         filtered_table = make_dataset.filter_feature_table(feature_table, 1, qiime_metadata_tf)
         
         # Permanova Test
-        braycurtis_matrix = metrics_analysis.calculate_distance_matrix(filtered_table,'braycurtis')
+        braycurtis_matrix = metrics_analysis.calculate_distance_matrices(filtered_table,['braycurtis'])['braycurtis']
         metrics_analysis.permanova_test(braycurtis_matrix, qiime_metadata_tf.get_column('abdominal_obesity_ncep_v2') ,'braycurtis')
         ## Obtaining model params
         with open("config/model-params.json") as fh:
@@ -118,27 +114,27 @@ def main(targets):
         #Create the UMAP embeddings matrix and plot the UMAP results
         umap_embedding = dimensionality_analysis.umap_plot_supervised(feature_df_target_disease, target_disease_map, target_disease_dict, **umap_params)
         
-
-        print('Permanova Test')
+        
         # Permanova Test - all diseases w/o precvd
         rarefied_table = make_dataset.rarefy_feature_table(filtered_table, depth)
         
         with open("config/dim-analysis-params.json") as fh:
             dim_analysis_params = json.load(fh)
         
-        
+        # Obtain distance matrices
         distance_matrices = metrics_analysis.calculate_distance_matrices(rarefied_table,metrics = dim_analysis_params['metrics'], phylogeny = tree_artifact)
         
+        # Obtain pcoa results based on distance matrices
+        pcoa_results = metrics_analysis.calculate_pcoa(distance_matrices, dim_analysis_params['pcoa_n_dimensions'])
         
-        pcoa_results = metrics_analysis.calculate_multiple_pcoa(distance_matrices, 3)
+        # Plot pcoa results
+        dimensionality_analysis.plot_pcoa(pcoa_results, qiime_metadata_tf)
         
-        
-        dimensionality_analysis.plot_multiple_pcoa(pcoa_results, qiime_metadata_tf)
-        
-        print('emperor done')
+        print('Permanova Test')
+        # Permanova Tests - all diseases w/o pre-cvd
         metrics_analysis.permanova_test_all_diseases(distance_matrices['unweighted_unifrac'], distance_matrices['weighted_unifrac'], qiime_metadata_tf, feature_params['disease_cols'])
-        
-        #Permanova Test - precvd
+
+        # Permanova Test - precvd
         u_unifrac_distance_matrix_precvd,w_unifrac_distance_matrix_precvd = metrics_analysis.calculate_unifrac_distance_matrices(filtered_table_precvd, tree_artifact)
         metrics_analysis.permanova_test(u_unifrac_distance_matrix_precvd, qiime_metadata_precvd.get_column('precvd_v2'),'u_unifrac')
         metrics_analysis.permanova_test(w_unifrac_distance_matrix_precvd, qiime_metadata_precvd.get_column('precvd_v2'),'w_unifrac')
