@@ -263,7 +263,7 @@ def save_pcoa_outputs(metrics):
     return
 
 
-def process_table_umap(table, metadata_df):
+def process_table_umap(table, metadata_df, disease_cols):
     '''
     Process the feature table by mapping disease labels into parameters for the UMAP algorithm
 
@@ -279,7 +279,7 @@ def process_table_umap(table, metadata_df):
     target_disease_mapped: Metadata information that has been processed to only include the target disease types and sample ID, mapped to the numeric encoding of the disease type (e.g, 1,2,3,4 or 5)
     target_disease_dict: The dictionary of the mapping of target disease
     '''
-    filtered_metadata_df = metadata_df.drop(['hispanic_origin', 'agegroup_c6_v2'], axis=1)
+    filtered_metadata_df = metadata_df[disease_cols]
     filtered_metadata_df = filtered_metadata_df[(filtered_metadata_df.sum(axis=1) == 1)] #We have around 300 samples left
     
     #Convert binary columns into a single categorical target column for disease type

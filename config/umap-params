@@ -1,0 +1,5 @@
+{
+    "n_neighbors": 75, 
+    "n_dimensions" : 2, 
+    "metric" :"jaccard"
+}
