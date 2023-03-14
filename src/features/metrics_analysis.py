@@ -1,6 +1,6 @@
 from qiime2.plugins.diversity.pipelines import core_metrics, core_metrics_phylogenetic,beta_phylogenetic,beta
 from qiime2.plugins.diversity.visualizers import beta_group_significance
-
+from qiime2.plugins.diversity.methods import pcoa
 
 def calculate_unifrac_distance_matrices(feature_table, phylogeny):
     """Calculate weighted and unweighted unifrac distance matrices
@@ -28,7 +28,15 @@ def calculate_distance_matrix(feature_table, metric):
         DistanceMatrix: Distance matrix based on feature table
     """
     return beta(feature_table, metric).distance_matrix
+
+def calculate_pcoa(distance_matrix, n_dimensions):
+    return pcoa(distance_matrix, n_dimensions).pcoa
         
+# def calculate_distance_matrices(feature_table, metrics, phylogeny=None):
+#     output = {}
+#     for x in metrics:
+#         if 
+#         output[x] = calculate_distance_matrix(feature_table, x)
 
 def permanova_test(distance_matrix, metadata_col, metric):
     """Perform permanova test on given column

@@ -7,6 +7,9 @@ import json
 import os
 import shutil
 
+from qiime2.plugins.emperor.visualizers import plot
+from qiime2.plugins.diversity.methods import pcoa
+
 from src.data import make_dataset
 from src.features import build_features,metrics_analysis
 from src.models import make_models, evaluate_models
@@ -120,6 +123,22 @@ def main(targets):
         # Permanova Test - all diseases w/o precvd
         rarefied_table = make_dataset.rarefy_feature_table(filtered_table, depth)
         u_unifrac_distance_matrix, w_unifrac_distance_matrix = metrics_analysis.calculate_unifrac_distance_matrices(rarefied_table, tree_artifact)
+        print('emperor')
+        p = metrics_analysis.calculate_pcoa(u_unifrac_distance_matrix, 3)
+        dimensionality_analysis.plot_pcoa(p, qiime_metadata_tf,'u_unifrac')
+        
+        p = metrics_analysis.calculate_pcoa(w_unifrac_distance_matrix, 3)
+        dimensionality_analysis.plot_pcoa(p, qiime_metadata_tf,'w_unifrac')
+        
+        braycurtis_matrix = metrics_analysis.calculate_distance_matrix(rarefied_table,'braycurtis')
+        p = metrics_analysis.calculate_pcoa(braycurtis_matrix, 3)
+        dimensionality_analysis.plot_pcoa(p, qiime_metadata_tf,'braycurtis')
+        
+        jaccard_matrix = metrics_analysis.calculate_distance_matrix(rarefied_table,'jaccard')
+        p = metrics_analysis.calculate_pcoa(braycurtis_matrix, 3)
+        dimensionality_analysis.plot_pcoa(p, qiime_metadata_tf,'jaccard')
+        
+        print('emperor done')
         metrics_analysis.permanova_test_all_diseases(u_unifrac_distance_matrix, w_unifrac_distance_matrix, qiime_metadata_tf, feature_params['disease_cols'])
         
         #Permanova Test - precvd
