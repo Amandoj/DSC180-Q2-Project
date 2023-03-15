@@ -26,10 +26,10 @@ and select the qiime2 kernel
 * To revert to a clean repository, from the project root dir, run `python run.py clean`
   * This deletes all built files
 * To run the entire project on test data, from the project root dir, run `python run.py test`
-  * This fetches the test data, creates features, cleans the data, creates machine learning models and model performance graphs
+  * This fetches the test data, creates features, cleans the data, performs permanova tests, creates pcoa plots, creates machine learning model and model performance graphs
   for given disease types
 * To run the entire project on the real data, from the project root dir, run `python run.py all`
-  * This fetches the original data, creates features, cleans the data, creates machine learning models and model performance graphs
+  * This fetches the original data, creates features, cleans the data, performs permanova tests, creates pcoa plots, performs UMAP, creates machine learning model and model performance graphs
   for given disease types
   
 ## Model Performance
