@@ -33,6 +33,6 @@ and select the qiime2 kernel
   for given disease types
   
 ## Model Performance
-To view model performance graphs, after running `run.py`, download `.qzv` files from `data/out` and upload to https://view.qiime2.org/
+To view model performance graphs, permanova tests, and pcoa plots after running `run.py`, download `.qzv` files from `data/out` and upload to https://view.qiime2.org/
 
 Collaborator: Amando Jimenez, Emerson Chao, Renaldy Herlim
