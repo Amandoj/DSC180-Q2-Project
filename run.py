@@ -143,7 +143,7 @@ def main(targets):
         metrics_analysis.permanova_test_all_diseases(distance_matrices['unweighted_unifrac'], distance_matrices['weighted_unifrac'], qiime_metadata_tf, feature_params['disease_cols'])
 
         # Permanova Test - balanced precvd
-        distance_matrices_precvd = metrics_analysis.calculate_distance_matrices(filtered_table_precvd, metrics = dim_analysis_paramas['precvd_metrics'], phylogeny = tree_artifact)       
+        distance_matrices_precvd = metrics_analysis.calculate_distance_matrices(filtered_table_precvd, metrics = dim_analysis_params['precvd_metrics'], phylogeny = tree_artifact)       
 
         metrics_analysis.permanova_test(distance_matrices_precvd["unweighted_unifrac"], qiime_metadata_precvd.get_column('precvd_v2'),'u_unifrac')
         metrics_analysis.permanova_test(distance_matrices_precvd["weighted_unifrac"], qiime_metadata_precvd.get_column('precvd_v2'),'w_unifrac')
