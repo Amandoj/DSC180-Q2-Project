@@ -63,3 +63,34 @@ def binary_relevance_accuracy_scores_graph(disease_accuracy_scores):
     ax.set_ylabel('Accuracy Score')
     plt.tight_layout()
     plt.savefig('data/out/GBC_accuracy_scores.png',bbox_inches='tight',dpi=300)
+    
+    
+def binary_relevance_accuracy_scores_graph_with_auc(disease_accuracy_scores, aucs):
+    """Create bar graph of accuracy scores and auc's of binary relevance model.
+
+    Args:
+        disease_accuracy_scores (Dict): Dictionary containing scores of model accuracy scores by disease type
+        aucs (Dict):Dictionary containing micro and macro average aucs. In the following format: {"disease col":[micro auc, macro auc]}.
+    """
+    micro = {}
+    macro = {}
+    for i in aucs.keys():
+        micro[i] = aucs[i][0]
+        macro[i] = aucs[i][1]
+    micro_average = pd.Series(micro, name='Percentage')
+    macro_average = pd.Series(macro, name='Percentage')
+    disease_accuracy_scores_series = pd.Series(disease_accuracy_scores, name='Percentage')
+    
+    micro_average = micro_average.reset_index().assign(metric_type=['micro-average AUC' for x in range(len(micro))])
+    macro_average = macro_average.reset_index().assign(metric_type=['macro-average AUC' for x in range(len(macro))])
+    disease_accuracy_scores_series = disease_accuracy_scores_series.reset_index().assign(
+        metric_type=['Overall Accuracy' for x in range(len(disease_accuracy_scores))])
+    
+    performance_metrics_seaborn = pd.concat([disease_accuracy_scores_series,micro_average,macro_average ])
+    performance_metrics_seaborn = performance_metrics_seaborn.rename(columns={'index':'Disease Type'})
+    performance_metrics_seaborn['Disease Type'] = performance_metrics_seaborn['Disease Type']
+    
+    plt.figure(figsize=(19,8))
+    plt.xticks(fontsize=12)
+    sns.barplot(data=performance_metrics_seaborn, x='Disease Type',y='Percentage',hue='metric_type')
+    plt.savefig('data/out/performance_metrics_with_auc.png',dpi=300,bbox_inches='tight')
