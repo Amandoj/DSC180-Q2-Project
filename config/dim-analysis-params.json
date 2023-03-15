@@ -1,1 +1,5 @@
-{"metrics":["unweighted_unifrac","weighted_unifrac","braycurtis","jaccard"],"pcoa_n_dimensions":3}
+{
+    "metrics":["unweighted_unifrac","weighted_unifrac","braycurtis","jaccard"],
+    "pcoa_n_dimensions":3,
+    "rarefy_sampling_depth": 7930
+    }

@@ -85,24 +85,21 @@ def main(targets):
         # Create disease count graph
         make_visualizations.disease_counts_graph(organized_metadata, feature_params['disease_cols'])
         
-        
         # Converting metadata dataframe to Qiime metadata object
         qiime_metadata_tf = make_dataset.read_qiime_metadata("data/temp/final_metadata_tf.tsv") #Metadata with True and False booleans
         qiime_metadata = make_dataset.read_qiime_metadata("data/temp/final_metadata.tsv") #Metadata with 1 and 0s floats
         # Balance Precvd classes
         qiime_metadata_precvd = build_features.balance_precvd(organized_metadata_tf)
 
+        min_samples = 4 # Minimum number of samples a given feature must be present in
         # Filtering Feature Tables 
-        filtered_table = make_dataset.filter_feature_table(feature_table, 4, qiime_metadata_tf)
-        filtered_table_precvd = make_dataset.filter_feature_table(feature_table, 4, qiime_metadata_precvd)
+        filtered_table = make_dataset.filter_feature_table(feature_table, min_samples, qiime_metadata_tf)
+        filtered_table_precvd = make_dataset.filter_feature_table(feature_table, min_samples, qiime_metadata_precvd)
         
         
         #DIMENSIONALITY ANALYSIS
         print('Dimensionality Analysis')
         
-        
-        depth = 7930 #The sampling depth used for the rarefecation of the feature table
-
         #Filtering metadata and feature table to only get samples with 1 target disease type, to remove disease ambiguity and perform supervised UMAP
         metadata_df = qiime_metadata.to_dataframe()
         feature_df_target_disease, target_disease_map, target_disease_dict = dimensionality_analysis.process_table_umap(feature_table, metadata_df, feature_params['disease_cols'])
@@ -115,12 +112,10 @@ def main(targets):
         umap_embedding = dimensionality_analysis.umap_plot_supervised(feature_df_target_disease, target_disease_map, target_disease_dict, **umap_params)
         
         
-        # Permanova Test - all diseases w/o precvd
-        rarefied_table = make_dataset.rarefy_feature_table(filtered_table, depth)
-        
         with open("config/dim-analysis-params.json") as fh:
             dim_analysis_params = json.load(fh)
-        
+            
+        rarefied_table = make_dataset.rarefy_feature_table(filtered_table, dim_analysis_params['rarefy_sampling_depth'])
         # Obtain distance matrices
         distance_matrices = metrics_analysis.calculate_distance_matrices(rarefied_table,metrics = dim_analysis_params['metrics'], phylogeny = tree_artifact)
         
@@ -145,11 +140,11 @@ def main(targets):
             model_params = json.load(fh)
             
         print('Model Training Begins')
-        # Creating machine learning models
-        binary_relevance_model = make_models.binary_relevance_model(feature_table, qiime_metadata_tf, qiime_metadata_precvd, model_params['disease_targets'])
+        # Creating machine learning model
+        binary_relevance_model = make_models.binary_relevance_model(feature_table, qiime_metadata_tf, qiime_metadata_precvd, **model_params)
         
         #Model Performance 
-        disease_accuracy_scores = evaluate_models.binary_relevance_accuracy_scores(binary_relevance_model, model_params['disease_targets'])
+        disease_accuracy_scores = evaluate_models.binary_relevance_accuracy_scores(binary_relevance_model, **model_params)
         make_visualizations.binary_relevance_accuracy_scores_graph(disease_accuracy_scores)
         print('END')
 

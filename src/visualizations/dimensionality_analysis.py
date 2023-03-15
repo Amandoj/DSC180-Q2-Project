@@ -18,7 +18,7 @@ def plot_pcoa(pcoa_results, metadata):
     """
     for metric in pcoa_results.keys():
         pcoa = pcoa_results[metric]
-        plot(pcoa=pcoa, metadata=metadata).visualization.save('outputs/'+metric+'_pcoa_emp')
+        plot(pcoa=pcoa, metadata=metadata).visualization.save('data/out/'+metric+'_pcoa_emp')
         
 def process_table_umap(table, metadata_df, disease_cols):
     '''
@@ -99,6 +99,6 @@ def umap_plot_supervised(feature_table, target, target_dict,n_neighbors, n_compo
     y=0.97,
     ha="left",
     )
-    plt.savefig('outputs/umap_supervised.png', dpi=300)
+    plt.savefig('data/out/umap_supervised.png', dpi=300)
     return embedding
 
