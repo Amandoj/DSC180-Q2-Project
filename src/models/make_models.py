@@ -31,13 +31,11 @@ def sample_classifier_single_disease(feature_table, metadataCol):
     results = classify_samples(feature_table, metadataCol, estimator='GradientBoostingClassifier', 
                                test_size = 0.3, cv = 10, random_state = 100, missing_samples='ignore')
     # results
-    model_summary = results.model_summary
     accuracy_results = results.accuracy_results
     
     # Saving Accuracy Results
     accuracy_results.save('data/out/accuracy_results_'+metadataCol.name)
-    # Saving model summary information
-    model_summary.save('data/out/model_summary_'+metadataCol.name)
+   
     return results
 
 def binary_relevance_model(feature_table, metadata, precvd_metadata, disease_targets):

@@ -1,19 +1,6 @@
 from qiime2.plugins.diversity.pipelines import core_metrics, core_metrics_phylogenetic,beta_phylogenetic,beta
 from qiime2.plugins.diversity.visualizers import beta_group_significance
 from qiime2.plugins.diversity.methods import pcoa
-
-# def calculate_distance_matrix(feature_table, metric):
-#     """Calculate distance matrix based on given metric, no phylogeny tree necessary
-
-#     Args:
-#         feature_table (FeatureTable[Frequency]): Feature table that will be used to calculate distance matrix
-#         metric (String): The beta diversity metric to be computed
-
-#     Returns:
-#         DistanceMatrix: Distance matrix based on feature table
-#     """
-#     return beta(feature_table, metric).distance_matrix
-
         
 def calculate_distance_matrices(feature_table, metrics, phylogeny=None):
     """Calculate distance matrices based on given metrics
@@ -80,4 +67,5 @@ def permanova_test_all_diseases(u_unifrac_dis_matrix, w_unifrac_dis_matrix, meta
         metadata_disease_col = metadata.get_column(disease)
         permanova_test(u_unifrac_dis_matrix, metadata_disease_col,'u_unifrac')
         permanova_test(w_unifrac_dis_matrix, metadata_disease_col,'w_unifrac')
+        
 

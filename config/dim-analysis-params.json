@@ -1,5 +1,7 @@
 {
+    "filter_min_samples": 4,
     "metrics":["unweighted_unifrac","weighted_unifrac","braycurtis","jaccard"],
+    "precvd_metrics":["unweighted_unifrac","weighted_unifrac"],
     "pcoa_n_dimensions":3,
     "rarefy_sampling_depth": 7930
     }

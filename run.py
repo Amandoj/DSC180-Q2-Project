@@ -38,11 +38,20 @@ def main(targets):
         
         # Convert metadata dataframe to qiime Metadata object
         qiime_metadata_tf = make_dataset.read_qiime_metadata("data/temp/final_metadata_tf.tsv")
-        filtered_table = make_dataset.filter_feature_table(feature_table, 1, qiime_metadata_tf)
+        filtered_table = make_dataset.filter_feature_table(feature_table, min_samples=1, metadata=qiime_metadata_tf)
         
-        # Permanova Test
-        braycurtis_matrix = metrics_analysis.calculate_distance_matrices(filtered_table,['braycurtis'])['braycurtis']
-        metrics_analysis.permanova_test(braycurtis_matrix, qiime_metadata_tf.get_column('abdominal_obesity_ncep_v2') ,'braycurtis')
+        # Calculate distance matrix
+        braycurtis_matrix = metrics_analysis.calculate_distance_matrices(filtered_table,['braycurtis'])
+        
+        # Obtain pcoa results based on distance matrices
+        pcoa_results = metrics_analysis.calculate_pcoa(braycurtis_matrix, n_dimensions=3)
+        
+        # Plot pcoa results
+        dimensionality_analysis.plot_pcoa(pcoa_results, qiime_metadata_tf)
+        
+        #Permanova Test
+        metrics_analysis.permanova_test(braycurtis_matrix['braycurtis'], qiime_metadata_tf.get_column('abdominal_obesity_ncep_v2') ,'braycurtis')
+        
         ## Obtaining model params
         with open("config/model-params.json") as fh:
             model_params = json.load(fh)
@@ -91,11 +100,6 @@ def main(targets):
         # Balance Precvd classes
         qiime_metadata_precvd = build_features.balance_precvd(organized_metadata_tf)
 
-        min_samples = 4 # Minimum number of samples a given feature must be present in
-        # Filtering Feature Tables 
-        filtered_table = make_dataset.filter_feature_table(feature_table, min_samples, qiime_metadata_tf)
-        filtered_table_precvd = make_dataset.filter_feature_table(feature_table, min_samples, qiime_metadata_precvd)
-        
         
         #DIMENSIONALITY ANALYSIS
         print('Dimensionality Analysis')
@@ -114,6 +118,14 @@ def main(targets):
         
         with open("config/dim-analysis-params.json") as fh:
             dim_analysis_params = json.load(fh)
+        
+        # Minimum number of samples a given feature must be present in
+        min_samples = dim_analysis_params['filter_min_samples'] 
+        
+        # Filtering Feature Tables 
+        filtered_table = make_dataset.filter_feature_table(feature_table, min_samples, qiime_metadata_tf)
+        filtered_table_precvd = make_dataset.filter_feature_table(feature_table, min_samples, qiime_metadata_precvd)
+        
             
         rarefied_table = make_dataset.rarefy_feature_table(filtered_table, dim_analysis_params['rarefy_sampling_depth'])
         # Obtain distance matrices
@@ -126,13 +138,15 @@ def main(targets):
         dimensionality_analysis.plot_pcoa(pcoa_results, qiime_metadata_tf)
         
         print('Permanova Test')
-        # Permanova Tests - all diseases w/o pre-cvd
+        
+        # Permanova Tests - all diseases w/o precvd
         metrics_analysis.permanova_test_all_diseases(distance_matrices['unweighted_unifrac'], distance_matrices['weighted_unifrac'], qiime_metadata_tf, feature_params['disease_cols'])
 
-        # Permanova Test - precvd
-        u_unifrac_distance_matrix_precvd,w_unifrac_distance_matrix_precvd = metrics_analysis.calculate_unifrac_distance_matrices(filtered_table_precvd, tree_artifact)
-        metrics_analysis.permanova_test(u_unifrac_distance_matrix_precvd, qiime_metadata_precvd.get_column('precvd_v2'),'u_unifrac')
-        metrics_analysis.permanova_test(w_unifrac_distance_matrix_precvd, qiime_metadata_precvd.get_column('precvd_v2'),'w_unifrac')
+        # Permanova Test - balanced precvd
+        distance_matrices_precvd = metrics_analysis.calculate_distance_matrices(filtered_table_precvd, metrics = dim_analysis_paramas['precvd_metrics'], phylogeny = tree_artifact)       
+
+        metrics_analysis.permanova_test(distance_matrices_precvd["unweighted_unifrac"], qiime_metadata_precvd.get_column('precvd_v2'),'u_unifrac')
+        metrics_analysis.permanova_test(distance_matrices_precvd["weighted_unifrac"], qiime_metadata_precvd.get_column('precvd_v2'),'w_unifrac')
 
 
         ## Obtaining model params
