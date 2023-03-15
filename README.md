@@ -36,3 +36,5 @@ and select the qiime2 kernel
 To view model performance graphs, permanova tests, and pcoa plots after running `run.py`, download `.qzv` files from `data/out` and upload to https://view.qiime2.org/
 
 Collaborator: Amando Jimenez, Emerson Chao, Renaldy Herlim
+
+For more information visit: https://renaldyh27.github.io/Capstone-Website/
